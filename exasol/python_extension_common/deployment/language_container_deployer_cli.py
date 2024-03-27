@@ -4,8 +4,10 @@ import re
 import click
 from enum import Enum
 from pathlib import Path
-from exasol.python_transformers_extension.deployment import deployment_utils as utils
-from exasol_transformers_extension.deployment.language_container_deployer import LanguageContainerDeployer
+from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
+
+DB_PASSWORD_ENVIRONMENT_VARIABLE = f"DB_PASSWORD"
+BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE = f"BUCKETFS_PASSWORD"
 
 
 class CustomizableParameters(Enum):
@@ -84,7 +86,7 @@ slc_parameter_formatters = _ParameterFormatters()
 @click.option('--bucketfs-use-https', type=bool, default=False)
 @click.option('--bucketfs-user', type=str, required=True, default="w")
 @click.option('--bucketfs-password', prompt='bucketFS password', hide_input=True,
-              default=lambda: os.environ.get(utils.BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE, ""))
+              default=lambda: os.environ.get(BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE, ""))
 @click.option('--bucket', type=str, required=True)
 @click.option('--path-in-bucket', type=str, required=True, default=None)
 @click.option('--container-file',
@@ -94,7 +96,7 @@ slc_parameter_formatters = _ParameterFormatters()
 @click.option('--dsn', type=str, required=True)
 @click.option('--db-user', type=str, required=True)
 @click.option('--db-pass', prompt='db password', hide_input=True,
-              default=lambda: os.environ.get(utils.DB_PASSWORD_ENVIRONMENT_VARIABLE, ""))
+              default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE, ""))
 @click.option('--language-alias', type=str, default="PYTHON3_TE")
 @click.option('--ssl-cert-path', type=str, default="")
 @click.option('--ssl-client-cert-path', type=str, default="")

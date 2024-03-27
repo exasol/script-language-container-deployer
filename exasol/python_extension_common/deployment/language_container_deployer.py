@@ -82,7 +82,7 @@ def get_language_settings(pyexasol_conn: pyexasol.ExaConnection, alter_type: Lan
     alter_type       - Activation level - SYSTEM or SESSION.
     """
     result = pyexasol_conn.execute(
-        f"""SELECT "{alter_type.value}_VALUE" FROM SYS.EXA_PARAMETERS WHERE 
+        f"""SELECT "{alter_type.value}_VALUE" FROM SYS.EXA_PARAMETERS WHERE
         PARAMETER_NAME='SCRIPT_LANGUAGES'""").fetchall()
     return result[0][0]
 
@@ -156,10 +156,10 @@ class LanguageContainerDeployer:
             message = dedent(f"""
             In SQL, you can activate the SLC of the Transformers Extension
             by using the following statements:
-    
+
             To activate the SLC only for the current session:
             {self.generate_activation_command(bucket_file_path, LanguageActivationLevel.Session, True)}
-    
+
             To activate the SLC on the system:
             {self.generate_activation_command(bucket_file_path, LanguageActivationLevel.System, True)}
             """)
