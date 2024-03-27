@@ -1,3 +1,5 @@
+# pylint: disable=too-many-arguments
+# pylint: disable-msg=too-many-locals
 from typing import Optional, Any
 import os
 import re

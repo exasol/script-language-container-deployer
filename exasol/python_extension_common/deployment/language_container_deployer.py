@@ -1,3 +1,5 @@
+# pylint: disable=too-many-arguments
+# pylint: disable-msg=too-many-locals
 from enum import Enum
 from textwrap import dedent
 from typing import List, Optional, Dict
