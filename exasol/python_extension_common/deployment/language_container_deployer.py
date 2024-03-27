@@ -1,13 +1,17 @@
 # pylint: disable=too-many-arguments
 # pylint: disable-msg=too-many-locals
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=line-too-long
 from enum import Enum
 from textwrap import dedent
 from typing import List, Optional, Dict
 from pathlib import Path, PurePosixPath
 import logging
 import tempfile
-import requests     # type: ignore
 import ssl
+import requests     # type: ignore
 import pyexasol     # type: ignore
 from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation             # type: ignore
 from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig     # type: ignore

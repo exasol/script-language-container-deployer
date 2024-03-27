@@ -1,11 +1,15 @@
 # pylint: disable=too-many-arguments
 # pylint: disable-msg=too-many-locals
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=line-too-long
 from typing import Optional, Any
 import os
 import re
-import click
 from enum import Enum
 from pathlib import Path
+import click
 from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
 
 DB_PASSWORD_ENVIRONMENT_VARIABLE = "DB_PASSWORD"

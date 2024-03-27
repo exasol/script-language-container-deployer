@@ -1,3 +1,7 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=line-too-long
 import click
 from exasol.python_extension_common.deployment.language_container_deployer_cli import (
     _ParameterFormatters, CustomizableParameters)

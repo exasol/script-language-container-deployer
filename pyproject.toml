@@ -51,7 +51,9 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
+    "exasol.toolbox.nox.tasks",
     "test.unit.*",
     "test.integration.*",
 ]
 ignore_errors = true
+ignore_missing_imports = true
