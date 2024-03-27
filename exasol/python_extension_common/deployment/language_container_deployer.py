@@ -97,7 +97,7 @@ class LanguageContainerDeployer:
         self._bucketfs_location = bucketfs_location
         self._language_alias = language_alias
         self._pyexasol_conn = pyexasol_connection
-        logger.debug(f"Init {LanguageContainerDeployer.__name__}")
+        logger.debug("Init %s", LanguageContainerDeployer.__name__)
 
     def download_and_run(self, url: str,
                          bucket_file_path: str,
@@ -115,7 +115,7 @@ class LanguageContainerDeployer:
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-            response = requests.get(url, stream=True)
+            response = requests.get(url, stream=True, timeout=300)
             response.raise_for_status()
             tmp_file.write(response.content)
 
@@ -154,7 +154,7 @@ class LanguageContainerDeployer:
             self.activate_container(bucket_file_path, LanguageActivationLevel.System, allow_override)
         else:
             message = dedent(f"""
-            In SQL, you can activate the SLC of the Transformers Extension
+            In SQL, you can activate the SLC
             by using the following statements:
 
             To activate the SLC only for the current session:

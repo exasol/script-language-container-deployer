@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 from pathlib import Path, PurePosixPath
 from unittest.mock import create_autospec, MagicMock, patch
 
@@ -66,7 +67,7 @@ def test_slc_deployer_upload(container_deployer, container_file_name, container_
     container_deployer.activate_container.assert_not_called()
 
 
-def test_slc_deployer_activate(container_deployer, container_file_name, container_file_path):
+def test_slc_deployer_activate(container_deployer, container_file_name):
     container_deployer.run(bucket_file_path=container_file_name, alter_system=True, allow_override=True)
     container_deployer.upload_container.assert_not_called()
     container_deployer.activate_container.assert_called_once_with(container_file_name, LanguageActivationLevel.System,
