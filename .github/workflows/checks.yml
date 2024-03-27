@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
+        with:
+          fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0

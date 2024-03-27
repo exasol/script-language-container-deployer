@@ -1,15 +1,15 @@
 from enum import Enum
 from textwrap import dedent
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pathlib import Path, PurePosixPath
 import logging
 import tempfile
-import requests
+import requests     # type: ignore
 import ssl
-import pyexasol
-from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation
-from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig
-from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig
+import pyexasol     # type: ignore
+from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation             # type: ignore
+from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig     # type: ignore
+from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig    # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
     """
 
     # Is server certificate validation required?
-    sslopt: dict[str, object] = {"cert_reqs": ssl.CERT_REQUIRED if use_ssl_cert_validation else ssl.CERT_NONE}
+    sslopt: Dict[str, object] = {"cert_reqs": ssl.CERT_REQUIRED if use_ssl_cert_validation else ssl.CERT_NONE}
 
     # Is a bundle with trusted CAs provided?
     if ssl_trusted_ca:
@@ -66,7 +66,7 @@ def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
 
 
 class LanguageActivationLevel(Enum):
-    f"""
+    """
     Language activation level, i.e.
     ALTER <LanguageActivationLevel> SET SCRIPT_LANGUAGES=...
     """
