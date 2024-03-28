@@ -1,8 +1,3 @@
-# pylint: disable=redefined-outer-name
-# pylint: disable=missing-module-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-function-docstring
-# pylint: disable=line-too-long
 from pathlib import Path, PurePosixPath
 from unittest.mock import create_autospec, MagicMock, patch
 

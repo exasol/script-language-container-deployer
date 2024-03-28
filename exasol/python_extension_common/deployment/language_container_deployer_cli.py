@@ -1,9 +1,3 @@
-# pylint: disable=too-many-arguments
-# pylint: disable-msg=too-many-locals
-# pylint: disable=missing-module-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-function-docstring
-# pylint: disable=line-too-long
 from typing import Optional, Any
 import os
 import re
