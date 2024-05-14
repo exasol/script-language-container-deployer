@@ -103,6 +103,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Checkout ITDE
+        run: git clone https://github.com/exasol/integration-test-docker-environment.git
+        working-directory: ..
+
+      - name: Start EXASOL Test-Environment
+        run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --db-mem-size 4GB
+        working-directory: ../integration-test-docker-environment
+
       - name: Calculate Test Coverage
         run: poetry run nox -s coverage -- -- --db-version ${{ matrix.exasol-version }}
 
