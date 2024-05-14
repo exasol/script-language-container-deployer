@@ -2,14 +2,58 @@
 name = "python-extension-common"
 version = "0.1.0"
 description = "A collection of common utilities for Exasol extensions."
-authors = ["Your Name <you@example.com>"]
+packages = [ {include = "exasol"}, ]
+authors = ["Mikhail Beck <mikhail.beck@exasol.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "[^3.8]"
+python = ">=3.8.0,<4.0"
+pyexasol = "^0.25.0"
+exasol-bucketfs = "^0.9.0"
+click = "^8.0.4"
 
+[tool.poetry.group.dev.dependencies]
+exasol-toolbox = "^0.8.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+relative_files = true
+source = [
+    "exasol",
+]
+
+[tool.coverage.report]
+fail_under = 15
+
+[tool.black]
+line-length = 100
+verbose = false
+include = "\\.pyi?$"
+
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2
+
+
+[tool.pylint.master]
+errors-only = true
+output-format = "colorized,json:.lint.json,text:.lint.txt"
+
+[tool.pylint.format]
+max-line-length = 100
+max-module-lines = 800
+
+
+[[tool.mypy.overrides]]
+module = [
+    "exasol.toolbox.nox.tasks",
+    "test.unit.*",
+    "test.integration.*",
+]
+ignore_errors = true
+ignore_missing_imports = true

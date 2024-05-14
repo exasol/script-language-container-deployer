@@ -1,11 +1,13 @@
 from typing import Optional, Any
 import os
 import re
-import click
 from enum import Enum
 from pathlib import Path
-from exasol.python_transformers_extension.deployment import deployment_utils as utils
-from exasol_transformers_extension.deployment.language_container_deployer import LanguageContainerDeployer
+import click
+from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
+
+DB_PASSWORD_ENVIRONMENT_VARIABLE = "DB_PASSWORD"
+BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE = "BUCKETFS_PASSWORD"
 
 
 class CustomizableParameters(Enum):
@@ -52,7 +54,7 @@ class _ParameterFormatters:
                 # before and after applying the regex, assuming the current parameter is 'version'.
                 # 'something-with-{version}/tailored-for-{user}' => 'something-with-{version}/tailored-for-{{user}}'
                 # We were looking for all occurrences of a pattern '{some_name}', where some_name is not version.
-                pattern = r'\{(?!' + param.name + r'\})\w+\}'
+                pattern = r'\{(?!' + (param.name or '') + r'\})\w+\}'
                 param_formatter = re.sub(pattern, lambda m: f'{{{m.group(0)}}}', param_formatter)
                 kwargs = {param.name: value}
                 ctx.params[parameter_name] = param_formatter.format(**kwargs)
@@ -84,7 +86,7 @@ slc_parameter_formatters = _ParameterFormatters()
 @click.option('--bucketfs-use-https', type=bool, default=False)
 @click.option('--bucketfs-user', type=str, required=True, default="w")
 @click.option('--bucketfs-password', prompt='bucketFS password', hide_input=True,
-              default=lambda: os.environ.get(utils.BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE, ""))
+              default=lambda: os.environ.get(BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE, ""))
 @click.option('--bucket', type=str, required=True)
 @click.option('--path-in-bucket', type=str, required=True, default=None)
 @click.option('--container-file',
@@ -94,7 +96,7 @@ slc_parameter_formatters = _ParameterFormatters()
 @click.option('--dsn', type=str, required=True)
 @click.option('--db-user', type=str, required=True)
 @click.option('--db-pass', prompt='db password', hide_input=True,
-              default=lambda: os.environ.get(utils.DB_PASSWORD_ENVIRONMENT_VARIABLE, ""))
+              default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE, ""))
 @click.option('--language-alias', type=str, default="PYTHON3_TE")
 @click.option('--ssl-cert-path', type=str, default="")
 @click.option('--ssl-client-cert-path', type=str, default="")
@@ -124,8 +126,8 @@ def language_container_deployer_main(
         upload_container: bool,
         alter_system: bool,
         allow_override: bool,
-        container_url: str = None,
-        container_name: str = None):
+        container_url: Optional[str] = None,
+        container_name: Optional[str] = None):
 
     deployer = LanguageContainerDeployer.create(
         bucketfs_name=bucketfs_name,
@@ -156,13 +158,3 @@ def language_container_deployer_main(
         # The error message should mention the parameters which the callback is specified for being missed.
         raise ValueError("To upload a language container you should specify either its "
                          "release version or a path of the already downloaded container file.")
-
-
-if __name__ == '__main__':
-    import logging
-
-    logging.basicConfig(
-        format='%(asctime)s - %(module)s  - %(message)s',
-        level=logging.DEBUG)
-
-    language_container_deployer_main()

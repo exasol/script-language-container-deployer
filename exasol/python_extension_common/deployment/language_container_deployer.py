@@ -1,15 +1,15 @@
 from enum import Enum
 from textwrap import dedent
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pathlib import Path, PurePosixPath
 import logging
 import tempfile
-import requests
 import ssl
-import pyexasol
-from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation
-from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig
-from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig
+import requests     # type: ignore
+import pyexasol     # type: ignore
+from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation             # type: ignore
+from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig     # type: ignore
+from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig    # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
     """
 
     # Is server certificate validation required?
-    sslopt: dict[str, object] = {"cert_reqs": ssl.CERT_REQUIRED if use_ssl_cert_validation else ssl.CERT_NONE}
+    sslopt: Dict[str, object] = {"cert_reqs": ssl.CERT_REQUIRED if use_ssl_cert_validation else ssl.CERT_NONE}
 
     # Is a bundle with trusted CAs provided?
     if ssl_trusted_ca:
@@ -66,7 +66,7 @@ def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
 
 
 class LanguageActivationLevel(Enum):
-    f"""
+    """
     Language activation level, i.e.
     ALTER <LanguageActivationLevel> SET SCRIPT_LANGUAGES=...
     """
@@ -82,7 +82,7 @@ def get_language_settings(pyexasol_conn: pyexasol.ExaConnection, alter_type: Lan
     alter_type       - Activation level - SYSTEM or SESSION.
     """
     result = pyexasol_conn.execute(
-        f"""SELECT "{alter_type.value}_VALUE" FROM SYS.EXA_PARAMETERS WHERE 
+        f"""SELECT "{alter_type.value}_VALUE" FROM SYS.EXA_PARAMETERS WHERE
         PARAMETER_NAME='SCRIPT_LANGUAGES'""").fetchall()
     return result[0][0]
 
@@ -97,7 +97,7 @@ class LanguageContainerDeployer:
         self._bucketfs_location = bucketfs_location
         self._language_alias = language_alias
         self._pyexasol_conn = pyexasol_connection
-        logger.debug(f"Init {LanguageContainerDeployer.__name__}")
+        logger.debug("Init %s", LanguageContainerDeployer.__name__)
 
     def download_and_run(self, url: str,
                          bucket_file_path: str,
@@ -115,7 +115,7 @@ class LanguageContainerDeployer:
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-            response = requests.get(url, stream=True)
+            response = requests.get(url, stream=True, timeout=300)
             response.raise_for_status()
             tmp_file.write(response.content)
 
@@ -154,12 +154,12 @@ class LanguageContainerDeployer:
             self.activate_container(bucket_file_path, LanguageActivationLevel.System, allow_override)
         else:
             message = dedent(f"""
-            In SQL, you can activate the SLC of the Transformers Extension
+            In SQL, you can activate the SLC
             by using the following statements:
-    
+
             To activate the SLC only for the current session:
             {self.generate_activation_command(bucket_file_path, LanguageActivationLevel.Session, True)}
-    
+
             To activate the SLC on the system:
             {self.generate_activation_command(bucket_file_path, LanguageActivationLevel.System, True)}
             """)

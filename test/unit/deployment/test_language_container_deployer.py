@@ -1,6 +1,3 @@
-#########################################################
-# To be migrated to the script-languages-container-tool #
-#########################################################
 from pathlib import Path, PurePosixPath
 from unittest.mock import create_autospec, MagicMock, patch
 
@@ -8,7 +5,7 @@ import pytest
 from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation
 from pyexasol import ExaConnection
 
-from exasol_transformers_extension.deployment.language_container_deployer import (
+from exasol.python_extension_common.deployment.language_container_deployer import (
     LanguageContainerDeployer, LanguageActivationLevel)
 
 
@@ -69,14 +66,14 @@ def test_slc_deployer_upload(container_deployer, container_file_name, container_
     container_deployer.activate_container.assert_not_called()
 
 
-def test_slc_deployer_activate(container_deployer, container_file_name, container_file_path):
+def test_slc_deployer_activate(container_deployer, container_file_name):
     container_deployer.run(bucket_file_path=container_file_name, alter_system=True, allow_override=True)
     container_deployer.upload_container.assert_not_called()
     container_deployer.activate_container.assert_called_once_with(container_file_name, LanguageActivationLevel.System,
                                                                   True)
 
 
-@patch('exasol_transformers_extension.deployment.language_container_deployer.get_language_settings')
+@patch('exasol.python_extension_common.deployment.language_container_deployer.get_language_settings')
 def test_slc_deployer_generate_activation_command(mock_lang_settings, container_deployer, language_alias,
                                                   container_file_name, container_bfs_path):
     mock_lang_settings.return_value = 'R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3'
@@ -91,7 +88,7 @@ def test_slc_deployer_generate_activation_command(mock_lang_settings, container_
     assert command == expected_command
 
 
-@patch('exasol_transformers_extension.deployment.language_container_deployer.get_language_settings')
+@patch('exasol.python_extension_common.deployment.language_container_deployer.get_language_settings')
 def test_slc_deployer_generate_activation_command_override(mock_lang_settings, container_deployer, language_alias,
                                                            container_file_name, container_bfs_path):
     current_bfs_path = 'bfsdefault/default/container_abc'
@@ -110,7 +107,7 @@ def test_slc_deployer_generate_activation_command_override(mock_lang_settings, c
     assert command == expected_command
 
 
-@patch('exasol_transformers_extension.deployment.language_container_deployer.get_language_settings')
+@patch('exasol.python_extension_common.deployment.language_container_deployer.get_language_settings')
 def test_slc_deployer_generate_activation_command_failure(mock_lang_settings, container_deployer, language_alias,
                                                           container_file_name):
     current_bfs_path = 'bfsdefault/default/container_abc'

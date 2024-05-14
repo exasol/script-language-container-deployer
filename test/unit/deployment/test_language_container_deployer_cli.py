@@ -1,5 +1,5 @@
 import click
-from exasol_transformers_extension.deployment.language_container_deployer_cli import (
+from exasol.python_extension_common.deployment.language_container_deployer_cli import (
     _ParameterFormatters, CustomizableParameters)
 
 
