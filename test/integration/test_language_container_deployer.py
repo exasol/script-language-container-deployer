@@ -10,7 +10,7 @@ from exasol_bucketfs_utils_python.bucketfs_factory import BucketFSFactory
 from exasol.python_extension_common.deployment.language_container_deployer import (
     LanguageContainerDeployer, LanguageActivationLevel)
 
-from test.utils.revert_language_settings import revert_language_settings    # pylint: disable=import-error
+from test.utils.revert_language_settings import revert_language_settings    # pylint: disable=import-error disable=no-name-in-module
 
 
 LANGUAGE_CONTAINER_URL = ("https://github.com/exasol/script-languages-release/releases/"
