@@ -22,6 +22,10 @@ exasol-script-languages-container-tool = "^0.18.2"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+testpaths = [
+    "test"
+]
+
 [tool.coverage.run]
 relative_files = true
 source = [
@@ -54,8 +58,7 @@ max-module-lines = 800
 [[tool.mypy.overrides]]
 module = [
     "exasol.toolbox.nox.tasks",
-    "test.unit.*",
-    "test.integration.*",
+    "test.*",
 ]
 ignore_errors = true
 ignore_missing_imports = true
