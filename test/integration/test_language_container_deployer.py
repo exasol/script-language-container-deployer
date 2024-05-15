@@ -91,7 +91,7 @@ def test_language_container_deployer_activation_fail(
         container_path: str,
         container_name: str):
     """
-    Tests that an attempt to activate a container using alias that already exists
+    Tests that an attempt to activate a container using an alias that already exists
     causes an exception if overriding is disallowed.
     """
     test_name: str = request.node.name
