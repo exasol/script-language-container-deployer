@@ -34,7 +34,7 @@ def test_language_container_deployer(
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
         bucketfs_config: config.BucketFs,
-        container_path: Path):
+        container_path: str):
     """
     Tests the deployment  of a container in one call, including the activation at the System level.
     """
@@ -48,7 +48,7 @@ def test_language_container_deployer(
         deployer = create_container_deployer(language_alias=language_alias,
                                              pyexasol_connection=pyexasol_connection,
                                              bucketfs_config=bucketfs_config)
-        deployer.run(container_file=container_path, alter_system=True, allow_override=True)
+        deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
         new_connection = stack.enter_context(connection_factory(exasol_config))
         assert_udf_running(new_connection, language_alias, schema)
 
@@ -88,7 +88,7 @@ def test_language_container_deployer_activation_fail(
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
         bucketfs_config: config.BucketFs,
-        container_path: Path,
+        container_path: str,
         container_name: str):
     """
     Tests that an attempt to activate a container using alias that already exists
@@ -104,7 +104,7 @@ def test_language_container_deployer_activation_fail(
         deployer = create_container_deployer(language_alias=language_alias,
                                              pyexasol_connection=pyexasol_connection,
                                              bucketfs_config=bucketfs_config)
-        deployer.run(container_file=container_path, alter_system=True, allow_override=True)
+        deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
         new_connection = stack.enter_context(connection_factory(exasol_config))
         deployer = create_container_deployer(language_alias=language_alias,
                                              pyexasol_connection=new_connection,

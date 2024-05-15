@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 import click
 import requests
@@ -46,11 +44,12 @@ def container_url(container_version) -> str:
 
 
 @pytest.fixture(scope='session')
-def container_path(tmp_path: Path, container_url) -> Path:
+def container_path(tmpdir_factory, container_url, container_name) -> str:
 
-    slc_path = tmp_path / SLC_NAME
-    response = requests.get(container_url)
+    response = requests.get(container_url, allow_redirects=True)
     response.raise_for_status()
-    with slc_path.open('wb') as f:
+    slc_path = tmpdir_factory.mktemp('container').join(container_name)
+    slc_path = str(slc_path)
+    with open(slc_path, 'wb') as f:
         f.write(response.content)
     return slc_path

@@ -16,7 +16,7 @@ def call_language_definition_deployer_cli(func,
                                           exasol_config: config.Exasol,
                                           bucketfs_config: config.BucketFs,
                                           language_alias: str,
-                                          container_path: Optional[Path] = None,
+                                          container_path: Optional[str] = None,
                                           version: Optional[str] = None,
                                           use_ssl_cert_validation: bool = False):
     parsed_url = urlparse(bucketfs_config.url)
@@ -43,13 +43,13 @@ def call_language_definition_deployer_cli(func,
         args_list += [
             "--no-use-ssl-cert-validation"
         ]
-    if version is not None:
+    if version:
         args_list += [
             "--version", version,
         ]
-    if container_path is not None:
+    if container_path:
         args_list += [
-            "--container-file", str(container_path),
+            "--container-file", container_path,
         ]
     runner = CliRunner()
     result = runner.invoke(func, args_list)
@@ -61,7 +61,7 @@ def test_language_container_deployer_cli_with_container_file(
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
         bucketfs_config: config.BucketFs,
-        container_path: Path,
+        container_path: str,
         main_func
 ):
     test_name: str = request.node.name
@@ -135,7 +135,7 @@ def test_language_container_deployer_cli_with_check_cert(
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
         bucketfs_config: config.BucketFs,
-        container_path: Path,
+        container_path: str,
         main_func
 ):
     expected_exception_message = '[SSL: CERTIFICATE_VERIFY_FAILED]'
