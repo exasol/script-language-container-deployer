@@ -127,7 +127,7 @@ def test_language_container_deployer_cli_with_missing_container_option(
                                                        bucketfs_config=bucketfs_config,
                                                        exasol_config=exasol_config)
         assert result.exit_code == 1
-        assert result.exception is ValueError
+        assert isinstance(result.exception, ValueError)
 
 
 def test_language_container_deployer_cli_with_check_cert(
@@ -154,4 +154,4 @@ def test_language_container_deployer_cli_with_check_cert(
                                                        use_ssl_cert_validation=True)
         assert result.exit_code == 1
         assert expected_exception_message in result.exception.args[0].message
-        assert result.exception is ExaConnectionFailedError
+        assert isinstance(result.exception, ExaConnectionFailedError)
