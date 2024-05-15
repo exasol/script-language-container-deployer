@@ -93,7 +93,7 @@ def test_language_container_deployer_cli_by_downloading_container(
 ):
     test_name: str = request.node.name
     schema = test_name
-    language_alias = f"PYTHON3_TE_{test_name.upper()}"
+    language_alias = f"PYTHON3_PEC_{test_name.upper()}"
     with ExitStack() as stack:
         pyexasol_connection = stack.enter_context(connection_factory(exasol_config))
         stack.enter_context(revert_language_settings(pyexasol_connection))
