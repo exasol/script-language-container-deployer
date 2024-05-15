@@ -30,6 +30,7 @@ def create_container_deployer(language_alias: str,
 
 
 def test_language_container_deployer(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
@@ -54,6 +55,7 @@ def test_language_container_deployer(
 
 
 def test_language_container_deployer_alter_session(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
@@ -84,6 +86,7 @@ def test_language_container_deployer_alter_session(
 
 
 def test_language_container_deployer_activation_fail(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,

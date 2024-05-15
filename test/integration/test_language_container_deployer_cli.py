@@ -1,6 +1,5 @@
 from typing import Optional, Callable
 from contextlib import ExitStack
-from pathlib import Path
 
 from urllib.parse import urlparse
 from _pytest.fixtures import FixtureRequest
@@ -57,6 +56,7 @@ def call_language_definition_deployer_cli(func,
 
 
 def test_language_container_deployer_cli_with_container_file(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
@@ -84,6 +84,7 @@ def test_language_container_deployer_cli_with_container_file(
 
 
 def test_language_container_deployer_cli_by_downloading_container(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
@@ -111,6 +112,7 @@ def test_language_container_deployer_cli_by_downloading_container(
 
 
 def test_language_container_deployer_cli_with_missing_container_option(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
@@ -131,6 +133,7 @@ def test_language_container_deployer_cli_with_missing_container_option(
 
 
 def test_language_container_deployer_cli_with_check_cert(
+        itde,
         request: FixtureRequest,
         connection_factory: Callable[[config.Exasol], ExaConnection],
         exasol_config: config.Exasol,
