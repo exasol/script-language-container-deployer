@@ -118,7 +118,7 @@ def test_language_container_deployer_cli_with_missing_container_option(
         main_func
 ):
     test_name: str = request.node.name
-    language_alias = f"PYTHON3_TE_{test_name.upper()}"
+    language_alias = f"PYTHON3_PEC_{test_name.upper()}"
     with ExitStack() as stack:
         pyexasol_connection = stack.enter_context(connection_factory(exasol_config))
         stack.enter_context(revert_language_settings(pyexasol_connection))
