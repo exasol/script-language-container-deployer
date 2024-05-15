@@ -92,7 +92,7 @@ def test_language_container_deployer_activation_fail(
         container_name: str):
     """
     Tests that an attempt to activate a container using alias that already exists
-    causes exception if overriding is disallowed.
+    causes an exception if overriding is disallowed.
     """
     test_name: str = request.node.name
     schema = test_name
