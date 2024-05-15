@@ -36,7 +36,7 @@ def test_language_container_deployer(
         bucketfs_config: config.BucketFs,
         container_path: str):
     """
-    Tests the deployment  of a container in one call, including the activation at the System level.
+    Tests the deployment of a container in one call, including the activation at the System level.
     """
     test_name: str = request.node.name
     schema = test_name
