@@ -11,7 +11,7 @@ from exasol.python_extension_common.deployment.language_container_deployer impor
 
 @pytest.fixture(scope='module')
 def container_file_name() -> str:
-    return 'container_xyz.tag.gz'
+    return 'container_xyz.tar.gz'
 
 
 @pytest.fixture(scope='module')

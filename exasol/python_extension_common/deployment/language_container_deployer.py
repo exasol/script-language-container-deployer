@@ -11,6 +11,8 @@ import exasol.bucketfs as bfs   # type: ignore
 
 logger = logging.getLogger(__name__)
 
+ARCHIVE_EXTENSIONS = [".tar.gz", ".tgz", ".zip", ".tar"]
+
 
 def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
                          ssl_trusted_ca: Optional[str] = None,
@@ -72,10 +74,17 @@ def get_language_settings(pyexasol_conn: pyexasol.ExaConnection, alter_type: Lan
 def get_udf_path(bucket_base_path: bfs.path.PathLike, bucket_file: str) -> PurePosixPath:
     """
     Returns the path of the specified file in a bucket, as it's seen from a UDF
+    For known types of archives removes the archive extension from the file name.
 
     bucket_base_path    - Base directory in the bucket
     bucket_file         - File path in the bucket, relative to the base directory.
     """
+
+    for extension in ARCHIVE_EXTENSIONS:
+        if bucket_file.endswith(extension):
+            bucket_file = bucket_file[: -len(extension)]
+            break
+
     file_path = bucket_base_path / bucket_file
     return PurePosixPath(file_path.as_udf_path())
 
