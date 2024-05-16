@@ -69,6 +69,17 @@ def get_language_settings(pyexasol_conn: pyexasol.ExaConnection, alter_type: Lan
     return result[0][0]
 
 
+def get_udf_path(bucket_base_path: bfs.path.PathLike, bucket_file: str) -> PurePosixPath:
+    """
+    Returns the path of the specified file in a bucket, as it's seen from a UDF
+
+    bucket_base_path    - Base directory in the bucket
+    bucket_file         - File path in the bucket, relative to the base directory.
+    """
+    file_path = bucket_base_path / bucket_file
+    return PurePosixPath(file_path.as_udf_path())
+
+
 class LanguageContainerDeployer:
 
     def __init__(self,
@@ -191,16 +202,12 @@ class LanguageContainerDeployer:
         allow_override   - If True the activation of a language container with the same alias will be overriden,
                            otherwise a RuntimeException will be thrown.
         """
-        path_in_udf = self._get_udf_path(bucket_file_path)
+        path_in_udf = get_udf_path(self._bucketfs_path, bucket_file_path)
         new_settings = \
             self._update_previous_language_settings(alter_type, allow_override, path_in_udf)
         alter_command = \
             f"ALTER {alter_type.value} SET SCRIPT_LANGUAGES='{new_settings}';"
         return alter_command
-
-    def _get_udf_path(self, bucket_file_path: str):
-        file_path = self._bucketfs_path / bucket_file_path
-        return file_path.as_udf_path()
 
     def _update_previous_language_settings(self, alter_type: LanguageActivationLevel,
                                            allow_override: bool,
@@ -219,7 +226,7 @@ class LanguageContainerDeployer:
 
         bucket_file_path - Path within the designated bucket where the container is uploaded.
         """
-        path_in_udf = self._get_udf_path(bucket_file_path)
+        path_in_udf = get_udf_path(self._bucketfs_path, bucket_file_path)
         result = self._generate_new_language_settings(path_in_udf=path_in_udf, prev_lang_aliases=[])
         return result
 
