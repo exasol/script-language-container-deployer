@@ -2,7 +2,7 @@ from pathlib import Path, PurePosixPath
 from unittest.mock import create_autospec, MagicMock, patch
 
 import pytest
-from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation
+import exasol.bucketfs as bfs
 from pyexasol import ExaConnection
 
 from exasol.python_extension_common.deployment.language_container_deployer import (
@@ -35,17 +35,17 @@ def mock_pyexasol_conn() -> ExaConnection:
 
 
 @pytest.fixture(scope='module')
-def mock_bfs_location(container_bfs_path) -> BucketFSLocation:
-    mock_loc = create_autospec(BucketFSLocation)
+def mock_bfs_path(container_bfs_path) -> bfs.path.PathLike:
+    mock_loc = create_autospec(bfs.path.PathLike)
     mock_loc.generate_bucket_udf_path.return_value = PurePosixPath(f'/buckets/{container_bfs_path}')
     return mock_loc
 
 
 @pytest.fixture
-def container_deployer(mock_pyexasol_conn, mock_bfs_location, language_alias) -> LanguageContainerDeployer:
+def container_deployer(mock_pyexasol_conn, mock_bfs_path, language_alias) -> LanguageContainerDeployer:
     deployer = LanguageContainerDeployer(pyexasol_connection=mock_pyexasol_conn,
                                          language_alias=language_alias,
-                                         bucketfs_location=mock_bfs_location)
+                                         bucketfs_path=mock_bfs_path)
 
     deployer.upload_container = MagicMock()
     deployer.activate_container = MagicMock()

@@ -10,7 +10,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.8.0,<4.0"
 pyexasol = "^0.25.0"
-exasol-bucketfs = "^0.9.0"
+exasol-bucketfs = ">=0.10.0"
 click = "^8.0.4"
 
 [tool.poetry.group.dev.dependencies]

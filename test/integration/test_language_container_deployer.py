@@ -6,7 +6,7 @@ import pytest
 
 from pyexasol import ExaConnection
 from pytest_itde import config
-from exasol_bucketfs_utils_python.bucketfs_factory import BucketFSFactory
+import exasol.bucketfs as bfs
 
 from exasol.python_extension_common.deployment.language_container_deployer import (
     LanguageContainerDeployer, LanguageActivationLevel)
@@ -21,14 +21,17 @@ TEST_LANGUAGE_ALIAS = "PYTHON3_PEC_TESTS"
 def create_container_deployer(language_alias: str,
                               pyexasol_connection: ExaConnection,
                               bucketfs_config: config.BucketFs) -> LanguageContainerDeployer:
-    bucket_fs_factory = BucketFSFactory()
-    bucketfs_location = bucket_fs_factory.create_bucketfs_location(
-        url=f"{bucketfs_config.url}/default/container;bfsdefault",
-        user=f"{bucketfs_config.username}",
-        pwd=f"{bucketfs_config.password}",
-        base_path=None)
+
+    bucketfs_path = bfs.path.build_path(backend=bfs.path.StorageBackend.onprem,
+                                        url=bucketfs_config.url,
+                                        username=bucketfs_config.username,
+                                        password=bucketfs_config.password,
+                                        service_name="bfsdefault",
+                                        bucket_name="default",
+                                        verify=False,
+                                        path="container")
     return LanguageContainerDeployer(
-        pyexasol_connection, language_alias, bucketfs_location)
+        pyexasol_connection, language_alias, bucketfs_path)
 
 
 def test_language_container_deployer(
