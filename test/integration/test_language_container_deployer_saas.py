@@ -54,6 +54,6 @@ def test_language_container_deployer(
                                              token=saas_token)
         deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
 
-        time.sleep(20.)
+        time.sleep(300.)
         new_connection = stack.enter_context(saas_connection_factory(compression=True))
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
