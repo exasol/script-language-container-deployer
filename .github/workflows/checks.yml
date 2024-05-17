@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Host
-        run: echo ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+        run: echo "${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}"
 
   version-check-job:
     name: Version Check
