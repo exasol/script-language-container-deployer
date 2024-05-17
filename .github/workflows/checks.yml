@@ -12,7 +12,7 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
         run: |
           echo "This is the host:"
-          echo "%SAAS_HOST%"
+          echo "$SAAS_HOST"
 
   version-check-job:
     name: Version Check
