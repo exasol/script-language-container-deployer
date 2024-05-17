@@ -100,7 +100,7 @@ def operational_saas_database_id(api_access) -> str:
     database_name = timestamp_name('PEC')
     with api_access.database(database_name) as db:
         api_access.wait_until_running(db.id)
-        yield db
+        yield db.id
 
 
 @pytest.fixture(scope="session")
