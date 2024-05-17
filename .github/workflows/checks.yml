@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
       - name: SCM Checkout
         uses: actions/checkout@v3
         with:
@@ -114,16 +115,10 @@ jobs:
 
       - name: Run Tests
         env:
-          # SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
-          SAAS_HOST: ${{ secrets.DUMMY_SAAS_HOST }}
-          # SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
-          SAAS_ACCOUNT_ID: ${{ secrets.DUMMY_SAAS_ACCOUNT_ID }}
-          # SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-          SAAS_PAT: ${{ secrets.DUMMY_SAAS_PAT }}
-          A: 123
-        run: |
-          echo $SAAS_HOST | base64
-          echo A = $A
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+        run:
           poetry run pytest test
 
       - name: Fail, if SaaS tests are not activated
