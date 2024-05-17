@@ -10,7 +10,9 @@ jobs:
       - name: Print Host
         env:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
-        run: echo "$SAAS_HOST"
+        run: |
+          echo "This is the host:"
+          echo "$SAAS_HOST"
 
   version-check-job:
     name: Version Check
