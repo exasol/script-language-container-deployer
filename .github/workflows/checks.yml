@@ -3,6 +3,12 @@ name: Checks
 on: workflow_call
 
 jobs:
+  debug-secrets-job:
+    name: Debug Secrets Access
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Host
+        run: echo ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
 
   version-check-job:
     name: Version Check
