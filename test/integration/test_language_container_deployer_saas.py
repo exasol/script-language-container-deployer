@@ -1,5 +1,6 @@
 from contextlib import ExitStack
 from pathlib import Path
+import time
 
 from pyexasol import ExaConnection
 import exasol.bucketfs as bfs
@@ -52,5 +53,7 @@ def test_language_container_deployer(
                                              database_id=operational_saas_database_id,
                                              token=saas_token)
         deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
+
+        time.sleep(20.)
         new_connection = stack.enter_context(saas_connection_factory(compression=True))
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
