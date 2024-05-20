@@ -12,6 +12,7 @@ from exasol.saas.client.api_access import (
 )
 from exasol.saas.client.openapi.models import CreateAllowedIP
 from exasol.saas.client.openapi.api.security.add_allowed_ip import sync as add_allowed_ip
+from exasol.saas.client.openapi.api.security.delete_allowed_ip import sync_detailed as delete_allowed_ip
 from exasol.saas.client.openapi.api.clusters.list_clusters import sync as list_clusters
 from exasol.saas.client.openapi.api.clusters.get_cluster_connection import sync as get_cluster_connection
 
@@ -108,7 +109,8 @@ def operational_saas_database_id(api_access) -> str:
 def saas_connection_params(saas_host, saas_token, saas_account_id, operational_saas_database_id) -> dict[str, Any]:
 
     with create_saas_client(saas_host, saas_token) as client:
-        ip_rule = CreateAllowedIP(name=timestamp_name('PEC_IP'),
+        ip_rule_name = timestamp_name('PEC_IP')
+        ip_rule = CreateAllowedIP(name=ip_rule_name,
                                   cidr_ip='0.0.0.0/0')
         add_allowed_ip(saas_account_id,
                        client=client,
@@ -127,4 +129,9 @@ def saas_connection_params(saas_host, saas_token, saas_account_id, operational_s
             'user': connections.db_username,
             'password': saas_token
         }
-        yield connection_params
+        try:
+            yield connection_params
+        finally:
+            delete_allowed_ip(saas_account_id,
+                              allowlist_ip_id=ip_rule_name,
+                              client=client)
