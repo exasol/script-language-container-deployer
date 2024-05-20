@@ -34,7 +34,6 @@ def create_container_deployer(language_alias: str,
         pyexasol_connection, language_alias, bucketfs_path)
 
 
-@pytest.mark.skip
 def test_language_container_deployer(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],
@@ -54,7 +53,6 @@ def test_language_container_deployer(
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
 
-@pytest.mark.skip
 def test_language_container_deployer_alter_session(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],
@@ -80,7 +78,6 @@ def test_language_container_deployer_alter_session(
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
 
-@pytest.mark.skip
 def test_language_container_deployer_activation_fail(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],

@@ -59,7 +59,6 @@ def call_language_definition_deployer_cli(func,
     return result
 
 
-@pytest.mark.skip
 def test_language_container_deployer_cli_with_container_file(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],
@@ -82,7 +81,6 @@ def test_language_container_deployer_cli_with_container_file(
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
 
-@pytest.mark.skip
 def test_language_container_deployer_cli_by_downloading_container(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],
@@ -105,7 +103,6 @@ def test_language_container_deployer_cli_by_downloading_container(
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
 
-@pytest.mark.skip
 def test_language_container_deployer_cli_with_missing_container_option(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],
@@ -122,7 +119,6 @@ def test_language_container_deployer_cli_with_missing_container_option(
         assert isinstance(result.exception, ValueError)
 
 
-@pytest.mark.skip
 def test_language_container_deployer_cli_with_check_cert(
         itde: config.TestConfig,
         connection_factory: Callable[[config.Exasol], ExaConnection],

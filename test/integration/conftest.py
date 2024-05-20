@@ -1,9 +1,10 @@
+from __future__ import annotations
+from typing import Any
 import os
 import pytest
 import click
 import requests
 
-import pyexasol
 from exasol.saas.client.api_access import (
     create_saas_client,
     timestamp_name,
@@ -104,7 +105,7 @@ def operational_saas_database_id(api_access) -> str:
 
 
 @pytest.fixture(scope="session")
-def saas_connection_factory(saas_host, saas_token, saas_account_id, operational_saas_database_id):
+def saas_connection_params(saas_host, saas_token, saas_account_id, operational_saas_database_id) -> dict[str, Any]:
 
     with create_saas_client(saas_host, saas_token) as client:
         ip_rule = CreateAllowedIP(name=timestamp_name('PEC_IP'),
@@ -121,9 +122,9 @@ def saas_connection_factory(saas_host, saas_token, saas_account_id, operational_
                                              cluster_id,
                                              client=client)
 
-        def create_pyexasol_connection(**kwargs) -> pyexasol.ExaConnection:
-            return pyexasol.connect(dsn=f'{connections.dns}:{connections.port}',
-                                    user=connections.db_username,
-                                    password=saas_token,
-                                    **kwargs)
-        yield create_pyexasol_connection
+        connection_params = {
+            'dsn': f'{connections.dns}:{connections.port}',
+            'user': connections.db_username,
+            'password': saas_token
+        }
+        yield connection_params
