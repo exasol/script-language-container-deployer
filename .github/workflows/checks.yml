@@ -86,7 +86,7 @@ jobs:
 
   tests-job:
     name: Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
-    # needs: [build-documentation-job, lint-job, type-check-job]
+    needs: [build-documentation-job, lint-job, type-check-job]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
