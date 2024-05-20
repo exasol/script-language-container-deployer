@@ -45,7 +45,7 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run nox -s coverage -- -m "not saas" --db-version ${{ matrix.exasol-version }}
+        run: poetry run nox -s coverage -- -- -m "not saas" --db-version ${{ matrix.exasol-version }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
