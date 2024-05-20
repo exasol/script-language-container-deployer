@@ -16,7 +16,8 @@ exasol-saas-api=">=0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
-exasol-toolbox = "^0.8.0"
+# exasol-toolbox = "^0.8.0"
+exasol-toolbox = { git = "https://github.com/exasol/python-toolbox.git", branch = "main" }
 exasol-script-languages-container-tool = "^0.18.2"
 
 [build-system]
@@ -63,3 +64,8 @@ module = [
 ]
 ignore_errors = true
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "saas: integration test that creates a db in SaaS.",
+]

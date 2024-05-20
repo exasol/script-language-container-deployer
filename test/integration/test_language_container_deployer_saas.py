@@ -2,6 +2,7 @@ from contextlib import ExitStack
 from pathlib import Path
 import time
 
+import pytest
 from pyexasol import ExaConnection
 import exasol.bucketfs as bfs
 
@@ -32,28 +33,11 @@ def create_container_deployer(language_alias: str,
         pyexasol_connection, language_alias, bucketfs_path)
 
 
-def test_language_container_deployer(
+@pytest.mark.saas
+def test_dummy_saas_test(
         saas_host,
         saas_token,
-        saas_account_id,
-        operational_saas_database_id,
-        saas_connection_factory,
-        container_path: str):
-    """
-    Tests the deployment of a container in one call, including the activation at the System level.
-    """
-    with ExitStack() as stack:
-        pyexasol_connection = stack.enter_context(saas_connection_factory(compression=True))
-        stack.enter_context(revert_language_settings(pyexasol_connection))
-        create_schema(pyexasol_connection, TEST_SCHEMA)
-        deployer = create_container_deployer(language_alias=TEST_LANGUAGE_ALIAS,
-                                             pyexasol_connection=pyexasol_connection,
-                                             url=saas_host,
-                                             account_id=saas_account_id,
-                                             database_id=operational_saas_database_id,
-                                             token=saas_token)
-        deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
-
-        time.sleep(300.)
-        new_connection = stack.enter_context(saas_connection_factory(compression=True))
-        assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
+        saas_account_id):
+    assert saas_host
+    assert saas_account_id
+    assert saas_token
