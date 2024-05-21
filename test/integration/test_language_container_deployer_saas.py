@@ -61,4 +61,5 @@ def test_language_container_deployer(
         # Need to give the SaaS BucketFS some time to digest the language container.
         # The required time is somewhere between 20 seconds and 5 minutes.
         time.sleep(300.)
-        assert_udf_running(pyexasol_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
+        new_connection = stack.enter_context(pyexasol.connect(**saas_connection_params, compression=True))
+        assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
