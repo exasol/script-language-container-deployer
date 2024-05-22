@@ -690,24 +690,20 @@ name = "exasol-saas-api"
 version = "0.6.0"
 description = "API enabling Python applications connecting to Exasol database SaaS instances and using their SaaS services"
 optional = false
-python-versions = ">=3.8.0,<4.0"
-files = []
-develop = false
+python-versions = "<4.0,>=3.8.0"
+files = [
+    {file = "exasol_saas_api-0.6.0-py3-none-any.whl", hash = "sha256:d6ff6501e10e97352459cd853f47053ed3affcc6d7c733debbe80b3f8c709aaa"},
+    {file = "exasol_saas_api-0.6.0.tar.gz", hash = "sha256:195ad5aaf15be270838e08b2e4a9fddb7981faf33ee00ed68042c5707d90612f"},
+]
 
 [package.dependencies]
 attrs = ">=21.3.0"
 httpx = ">=0.20.0,<0.28.0"
-ifaddr = "^0.2.0"
-python-dateutil = "^2.8.0"
-requests = "^2.31.0"
-tenacity = "^8.2.3"
-types-requests = "^2.31.0.6"
-
-[package.source]
-type = "git"
-url = "https://github.com/exasol/saas-api-python.git"
-reference = "main"
-resolved_reference = "7d4a78ab4ef58cc65b73cf28f15cf576154430d0"
+ifaddr = ">=0.2.0,<0.3.0"
+python-dateutil = ">=2.8.0,<3.0.0"
+requests = ">=2.31.0,<3.0.0"
+tenacity = ">=8.2.3,<9.0.0"
+types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
@@ -733,36 +729,32 @@ name = "exasol-toolbox"
 version = "0.12.0"
 description = ""
 optional = false
-python-versions = "^3.8"
-files = []
-develop = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "exasol_toolbox-0.12.0-py3-none-any.whl", hash = "sha256:663ef58c6cebab202ec180159564bac903b99d5d373f42149e5b990e2a390c8e"},
+    {file = "exasol_toolbox-0.12.0.tar.gz", hash = "sha256:1529bf533d1f4ae7288d750b91dfabe8aaf0dcd6c7919540259780caef2b4794"},
+]
 
 [package.dependencies]
-black = "^23.1.0"
+black = ">=23.1.0,<24.0.0"
 coverage = ">=6.4.4,<8.0.0"
 furo = ">=2022.9.15"
 importlib-resources = ">=5.12.0"
-isort = "^5.12.0"
+isort = ">=5.12.0,<6.0.0"
 mypy = ">=0.971"
 myst-parser = ">=2.0.0,<4"
 nox = ">=2022.8.7"
-pluggy = "^1.5.0"
-pre-commit = "^3.1.1"
-prysk = {version = "^0.17.0", extras = ["pytest-plugin"]}
+pluggy = ">=1.5.0,<2.0.0"
+pre-commit = ">=3.1.1,<4.0.0"
+prysk = {version = ">=0.17.0,<0.18.0", extras = ["pytest-plugin"]}
 pylint = ">=2.15.4"
-pytest = "^7.2.2"
+pytest = ">=7.2.2,<8.0.0"
 pyupgrade = ">=2.38.2,<4.0.0"
-shibuya = "^2024.5.14"
+shibuya = ">=2024.5.14,<2025.0.0"
 sphinx = ">=5.3,<7.0"
-sphinx-copybutton = "^0.5.0"
-sphinx-design = "^0.5.0"
+sphinx-copybutton = ">=0.5.0,<0.6.0"
+sphinx-design = ">=0.5.0,<0.6.0"
 typer = {version = ">=0.7.0", extras = ["all"]}
-
-[package.source]
-type = "git"
-url = "https://github.com/exasol/python-toolbox.git"
-reference = "main"
-resolved_reference = "0a514bf86a736da856ff6ce39f527022f837d0be"
 
 [[package]]
 name = "exceptiongroup"
@@ -1902,13 +1894,13 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.32.2"
+version = "2.31.0"
 description = "Python HTTP for Humans."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c"},
-    {file = "requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289"},
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
+    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
 ]
 
 [package.dependencies]
@@ -2628,4 +2620,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<4.0"
-content-hash = "c10773daa3823b605fa1524f25655fba2a63c63dbbe0a564c07cfa64ba378c68"
+content-hash = "6dbd36baea42a138ca5cd8324193a426b5f8abce16ae802ab0ac9906f736f9e7"
