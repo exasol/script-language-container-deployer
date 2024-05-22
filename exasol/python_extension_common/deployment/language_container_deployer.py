@@ -8,6 +8,8 @@ import ssl
 import requests     # type: ignore
 import pyexasol     # type: ignore
 import exasol.bucketfs as bfs   # type: ignore
+from exasol.saas.client.api_access import get_connection_params     # type: ignore
+
 
 logger = logging.getLogger(__name__)
 
@@ -268,7 +270,8 @@ class LanguageContainerDeployer:
 
     @classmethod
     def create(cls,
-               dsn: str, db_user: str, db_password: str, language_alias: str,
+               language_alias: str, dsn: Optional[str] = None,
+               db_user: Optional[str] = None, db_password: Optional[str] = None,
                bucketfs_host: Optional[str] = None, bucketfs_port: Optional[int] = None,
                bucketfs_name: Optional[str] = None, bucket: Optional[str] = None,
                bucketfs_user: Optional[str] = None, bucketfs_password: Optional[str] = None,
@@ -281,20 +284,10 @@ class LanguageContainerDeployer:
                ssl_client_certificate: Optional[str] = None,
                ssl_private_key: Optional[str] = None) -> "LanguageContainerDeployer":
 
-        websocket_sslopt = get_websocket_sslopt(use_ssl_cert_validation, ssl_trusted_ca,
-                                                ssl_client_certificate, ssl_private_key)
-
-        pyexasol_conn = pyexasol.connect(
-            dsn=dsn,
-            user=db_user,
-            password=db_password,
-            encryption=True,
-            websocket_sslopt=websocket_sslopt
-        )
-
-        # Infer where the BucketFS is - on-prem or SaaS.
-        if all((bucketfs_host, bucketfs_port, bucketfs_name, bucket,
-                bucketfs_user, bucketfs_password)):
+        # Infer where the database is - on-prem or SaaS.
+        if all((dsn, db_user, db_password, bucketfs_host, bucketfs_port,
+                bucketfs_name, bucket, bucketfs_user, bucketfs_password)):
+            connection_params = {'dsn': dsn, 'user': db_user, 'password': db_password}
             bfs_url = (f"{'https' if bucketfs_use_https else 'http'}://"
                        f"{bucketfs_host}:{bucketfs_port}")
             verify = ssl_trusted_ca or use_ssl_cert_validation
@@ -306,7 +299,12 @@ class LanguageContainerDeployer:
                                                 bucket_name=bucket,
                                                 verify=verify,
                                                 path=path_in_bucket)
+
         elif all((saas_url, saas_account_id, saas_database_id, saas_token)):
+            connection_params = get_connection_params(host=saas_url,
+                                                      account_id=saas_account_id,
+                                                      database_id=saas_database_id,
+                                                      pat=saas_token)
             bucketfs_path = bfs.path.build_path(backend=bfs.path.StorageBackend.saas,
                                                 url=saas_url,
                                                 account_id=saas_account_id,
@@ -314,6 +312,18 @@ class LanguageContainerDeployer:
                                                 pat=saas_token,
                                                 path=path_in_bucket)
         else:
-            raise ValueError('Insufficient parameters to access the BucketFS service')
+            raise ValueError('Incomplete parameter list. '
+                             'Please either provide the parameters [dns, db_user, '
+                             'db_password, bucketfs_host, bucketfs_port, bucketfs_name, '
+                             'bucket, bucketfs_user, bucketfs_password] for an On-Prem '
+                             'database or [saas_url, saas_account_id, saas_database_id, '
+                             'saas_token] for a SaaS database.')
+
+        websocket_sslopt = get_websocket_sslopt(use_ssl_cert_validation, ssl_trusted_ca,
+                                                ssl_client_certificate, ssl_private_key)
+
+        pyexasol_conn = pyexasol.connect(**connection_params,
+                                         encryption=True,
+                                         websocket_sslopt=websocket_sslopt)
 
         return cls(pyexasol_conn, language_alias, bucketfs_path)

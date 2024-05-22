@@ -9,6 +9,7 @@ from exasol.saas.client.api_access import (
     create_saas_client,
     timestamp_name,
     OpenApiAccess,
+    get_connection_params
 )
 from exasol.saas.client.openapi.models import CreateAllowedIP
 from exasol.saas.client.openapi.api.security.add_allowed_ip import sync as add_allowed_ip
@@ -106,32 +107,11 @@ def operational_saas_database_id(api_access) -> str:
 
 
 @pytest.fixture(scope="session")
-def saas_connection_params(saas_host, saas_token, saas_account_id, operational_saas_database_id) -> dict[str, Any]:
-
-    with create_saas_client(saas_host, saas_token) as client:
-        ip_rule_name = timestamp_name('PEC_IP')
-        ip_rule = CreateAllowedIP(name=ip_rule_name,
-                                  cidr_ip='0.0.0.0/0')
-        add_allowed_ip(saas_account_id,
-                       client=client,
-                       body=ip_rule)
-        clusters = list_clusters(saas_account_id,
-                                 operational_saas_database_id,
-                                 client=client)
-        cluster_id = next(filter(lambda cl: cl.main_cluster, clusters)).id
-        connections = get_cluster_connection(saas_account_id,
-                                             operational_saas_database_id,
-                                             cluster_id,
-                                             client=client)
-
-        connection_params = {
-            'dsn': f'{connections.dns}:{connections.port}',
-            'user': connections.db_username,
-            'password': saas_token
-        }
-        try:
-            yield connection_params
-        finally:
-            delete_allowed_ip(saas_account_id,
-                              allowlist_ip_id=ip_rule_name,
-                              client=client)
+def saas_connection_params(saas_host, saas_token, saas_account_id, operational_saas_database_id,
+                           api_access) -> dict[str, Any]:
+    with api_access.allowed_ip():
+        connection_params = get_connection_params(host=saas_host,
+                                                  account_id=saas_account_id,
+                                                  database_id=operational_saas_database_id,
+                                                  pat=saas_token)
+        yield connection_params

@@ -12,7 +12,8 @@ python = ">=3.8.0,<4.0"
 pyexasol = "^0.25.0"
 exasol-bucketfs = ">=0.10.0"
 click = "^8.0.4"
-exasol-saas-api=">=0.4.0"
+# exasol-saas-api=">=0.4.0"
+exasol-saas-api = { git = "https://github.com/exasol/saas-api-python.git", branch = "main" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

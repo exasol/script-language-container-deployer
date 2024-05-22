@@ -687,23 +687,27 @@ simplejson = ">=3.16.0"
 
 [[package]]
 name = "exasol-saas-api"
-version = "0.5.0"
+version = "0.6.0"
 description = "API enabling Python applications connecting to Exasol database SaaS instances and using their SaaS services"
 optional = false
-python-versions = "<4.0,>=3.8.0"
-files = [
-    {file = "exasol_saas_api-0.5.0-py3-none-any.whl", hash = "sha256:a2b81ad4100dc6d2f0f8dc6d0e2b18a0f67d04c3f7d2eb117e8038fe9db87eee"},
-    {file = "exasol_saas_api-0.5.0.tar.gz", hash = "sha256:164f31c23fc54ddda18b0a881880b91cff6cd07926f73c154a9b8f44f4cf9575"},
-]
+python-versions = ">=3.8.0,<4.0"
+files = []
+develop = false
 
 [package.dependencies]
 attrs = ">=21.3.0"
 httpx = ">=0.20.0,<0.28.0"
-ifaddr = ">=0.2.0,<0.3.0"
-python-dateutil = ">=2.8.0,<3.0.0"
-requests = ">=2.31.0,<3.0.0"
-tenacity = ">=8.2.3,<9.0.0"
-types-requests = ">=2.31.0.6,<3.0.0.0"
+ifaddr = "^0.2.0"
+python-dateutil = "^2.8.0"
+requests = "^2.31.0"
+tenacity = "^8.2.3"
+types-requests = "^2.31.0.6"
+
+[package.source]
+type = "git"
+url = "https://github.com/exasol/saas-api-python.git"
+reference = "main"
+resolved_reference = "7d4a78ab4ef58cc65b73cf28f15cf576154430d0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
@@ -758,7 +762,7 @@ typer = {version = ">=0.7.0", extras = ["all"]}
 type = "git"
 url = "https://github.com/exasol/python-toolbox.git"
 reference = "main"
-resolved_reference = "bb2228f6e3b86d132f71c10ecb74b2688f153867"
+resolved_reference = "0a514bf86a736da856ff6ce39f527022f837d0be"
 
 [[package]]
 name = "exceptiongroup"
@@ -1106,12 +1110,12 @@ files = [
 
 [[package]]
 name = "luigi"
-version = "3.5.0"
+version = "3.5.1"
 description = "Workflow mgmgt + task scheduling + dependency resolution."
 optional = false
 python-versions = "*"
 files = [
-    {file = "luigi-3.5.0.tar.gz", hash = "sha256:d3ede04966655c13bc4f473f6390268c62e83c4c4540d78936c4f12496e4f128"},
+    {file = "luigi-3.5.1.tar.gz", hash = "sha256:fc790b2747515dd19c673efbb8e4c9ace5f4c5cdc31f8e7f93dc667deb2ec6c8"},
 ]
 
 [package.dependencies]
@@ -1898,13 +1902,13 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.31.0"
+version = "2.32.2"
 description = "Python HTTP for Humans."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
-    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
+    {file = "requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c"},
+    {file = "requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289"},
 ]
 
 [package.dependencies]
@@ -1952,19 +1956,18 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "setuptools"
-version = "69.5.1"
+version = "70.0.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-69.5.1-py3-none-any.whl", hash = "sha256:c636ac361bc47580504644275c9ad802c50415c7522212252c033bd15f301f32"},
-    {file = "setuptools-69.5.1.tar.gz", hash = "sha256:6c1fccdac05a97e598fb0ae3bbed5904ccb317337a51139dcd51453611bbb987"},
+    {file = "setuptools-70.0.0-py3-none-any.whl", hash = "sha256:54faa7f2e8d2d11bcd2c07bed282eef1046b5c080d1c32add737d7b5817b1ad4"},
+    {file = "setuptools-70.0.0.tar.gz", hash = "sha256:f211a66637b8fa059bb28183da127d4e86396c991a942b028c6650d4319c3fd0"},
 ]
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
-testing = ["build[virtualenv]", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.9)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "mypy (==1.9)", "packaging (>=23.2)", "pip (>=19.1)", "pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.2.1)", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
-testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.2)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
+testing = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "mypy (==1.9)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.2.1)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
 name = "shellingham"
@@ -2452,13 +2455,13 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20240406"
+version = "2.32.0.20240521"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20240406.tar.gz", hash = "sha256:4428df33c5503945c74b3f42e82b181e86ec7b724620419a2966e2de604ce1a1"},
-    {file = "types_requests-2.31.0.20240406-py3-none-any.whl", hash = "sha256:6216cdac377c6b9a040ac1c0404f7284bd13199c0e1bb235f4324627e8898cf5"},
+    {file = "types-requests-2.32.0.20240521.tar.gz", hash = "sha256:c5c4a0ae95aad51f1bf6dae9eed04a78f7f2575d4b171da37b622e08b93eb5d3"},
+    {file = "types_requests-2.32.0.20240521-py3-none-any.whl", hash = "sha256:ab728ba43ffb073db31f21202ecb97db8753ded4a9dc49cb480d8a5350c5c421"},
 ]
 
 [package.dependencies]
@@ -2625,4 +2628,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<4.0"
-content-hash = "d1c138153d208a1acf06c6c6cbc0f09446acdaea9d75e688ab1371d1d7d80ca5"
+content-hash = "c10773daa3823b605fa1524f25655fba2a63c63dbbe0a564c07cfa64ba378c68"

@@ -104,9 +104,9 @@ slc_parameter_formatters = _ParameterFormatters()
               type=click.Path(exists=True, file_okay=True))
 @click.option('--version', type=str, expose_value=False,
               callback=slc_parameter_formatters)
-@click.option('--dsn', type=str, required=True)
-@click.option('--db-user', type=str, required=True)
-@click.option('--db-pass', prompt='db password', hide_input=True,
+@click.option('--dsn', type=str)
+@click.option('--db-user', type=str)
+@click.option('--db-pass',
               default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE))
 @click.option('--language-alias', type=str, default="PYTHON3_EXT")
 @click.option('--ssl-cert-path', type=str, default="")

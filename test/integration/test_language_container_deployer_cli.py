@@ -77,6 +77,9 @@ def test_language_container_deployer_cli_with_container_file(
         assert result.exit_code == 0
         assert result.exception is None
         assert result.stdout == ""
+        # In order to check that the uploaded container works we need a new pyexasol connection.
+        # The deployer should have activated the language container at the system level but that would
+        # not affect pre-existing sessions.
         new_connection = stack.enter_context(connection_factory(itde.db))
         assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
