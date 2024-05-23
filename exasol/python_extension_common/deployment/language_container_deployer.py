@@ -7,27 +7,13 @@ import tempfile
 import ssl
 import requests     # type: ignore
 import pyexasol     # type: ignore
-from exasol_bucketfs_utils_python.bucketfs_location import BucketFSLocation             # type: ignore
-from exasol_bucketfs_utils_python.bucket_config import BucketConfig, BucketFSConfig     # type: ignore
-from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig    # type: ignore
+import exasol.bucketfs as bfs   # type: ignore
+from exasol.saas.client.api_access import get_connection_params     # type: ignore
+
 
 logger = logging.getLogger(__name__)
 
-
-def create_bucketfs_location(
-        bucketfs_name: str, bucketfs_host: str, bucketfs_port: int,
-        bucketfs_use_https: bool, bucketfs_user: str, bucketfs_password: str,
-        bucket: str, path_in_bucket: str) -> BucketFSLocation:
-    _bucketfs_connection = BucketFSConnectionConfig(
-        host=bucketfs_host, port=bucketfs_port, user=bucketfs_user,
-        pwd=bucketfs_password, is_https=bucketfs_use_https)
-    _bucketfs_config = BucketFSConfig(
-        bucketfs_name=bucketfs_name, connection_config=_bucketfs_connection)
-    _bucket_config = BucketConfig(
-        bucket_name=bucket, bucketfs_config=_bucketfs_config)
-    return BucketFSLocation(
-        bucket_config=_bucket_config,
-        base_path=PurePosixPath(path_in_bucket))
+ARCHIVE_EXTENSIONS = [".tar.gz", ".tgz", ".zip", ".tar"]
 
 
 def get_websocket_sslopt(use_ssl_cert_validation: bool = True,
@@ -87,14 +73,32 @@ def get_language_settings(pyexasol_conn: pyexasol.ExaConnection, alter_type: Lan
     return result[0][0]
 
 
+def get_udf_path(bucket_base_path: bfs.path.PathLike, bucket_file: str) -> PurePosixPath:
+    """
+    Returns the path of the specified file in a bucket, as it's seen from a UDF
+    For known types of archives removes the archive extension from the file name.
+
+    bucket_base_path    - Base directory in the bucket
+    bucket_file         - File path in the bucket, relative to the base directory.
+    """
+
+    for extension in ARCHIVE_EXTENSIONS:
+        if bucket_file.endswith(extension):
+            bucket_file = bucket_file[: -len(extension)]
+            break
+
+    file_path = bucket_base_path / bucket_file
+    return PurePosixPath(file_path.as_udf_path())
+
+
 class LanguageContainerDeployer:
 
     def __init__(self,
                  pyexasol_connection: pyexasol.ExaConnection,
                  language_alias: str,
-                 bucketfs_location: BucketFSLocation) -> None:
+                 bucketfs_path: bfs.path.PathLike) -> None:
 
-        self._bucketfs_location = bucketfs_location
+        self._bucketfs_path = bucketfs_path
         self._language_alias = language_alias
         self._pyexasol_conn = pyexasol_connection
         logger.debug("Init %s", LanguageContainerDeployer.__name__)
@@ -177,8 +181,8 @@ class LanguageContainerDeployer:
             raise RuntimeError(f"Container file {container_file} "
                                f"is not a file.")
         with open(container_file, "br") as f:
-            self._bucketfs_location.upload_fileobj_to_bucketfs(
-                fileobj=f, bucket_file_path=bucket_file_path)
+            file_path = self._bucketfs_path / bucket_file_path
+            file_path.write(f)
         logging.debug("Container is uploaded to bucketfs")
 
     def activate_container(self, bucket_file_path: str,
@@ -209,7 +213,7 @@ class LanguageContainerDeployer:
         allow_override   - If True the activation of a language container with the same alias will be overriden,
                            otherwise a RuntimeException will be thrown.
         """
-        path_in_udf = self._bucketfs_location.generate_bucket_udf_path(bucket_file_path)
+        path_in_udf = get_udf_path(self._bucketfs_path, bucket_file_path)
         new_settings = \
             self._update_previous_language_settings(alter_type, allow_override, path_in_udf)
         alter_command = \
@@ -233,7 +237,7 @@ class LanguageContainerDeployer:
 
         bucket_file_path - Path within the designated bucket where the container is uploaded.
         """
-        path_in_udf = self._bucketfs_location.generate_bucket_udf_path(bucket_file_path)
+        path_in_udf = get_udf_path(self._bucketfs_path, bucket_file_path)
         result = self._generate_new_language_settings(path_in_udf=path_in_udf, prev_lang_aliases=[])
         return result
 
@@ -265,27 +269,61 @@ class LanguageContainerDeployer:
                 raise RuntimeError(warning_message)
 
     @classmethod
-    def create(cls, bucketfs_name: str, bucketfs_host: str, bucketfs_port: int,
-               bucketfs_use_https: bool, bucketfs_user: str,
-               bucketfs_password: str, bucket: str, path_in_bucket: str,
-               dsn: str, db_user: str, db_password: str, language_alias: str,
+    def create(cls,
+               language_alias: str, dsn: Optional[str] = None,
+               db_user: Optional[str] = None, db_password: Optional[str] = None,
+               bucketfs_host: Optional[str] = None, bucketfs_port: Optional[int] = None,
+               bucketfs_name: Optional[str] = None, bucket: Optional[str] = None,
+               bucketfs_user: Optional[str] = None, bucketfs_password: Optional[str] = None,
+               bucketfs_use_https: bool = True,
+               saas_url: Optional[str] = None,
+               saas_account_id: Optional[str] = None, saas_database_id: Optional[str] = None,
+               saas_token: Optional[str] = None,
+               path_in_bucket: str = '',
                use_ssl_cert_validation: bool = True, ssl_trusted_ca: Optional[str] = None,
                ssl_client_certificate: Optional[str] = None,
                ssl_private_key: Optional[str] = None) -> "LanguageContainerDeployer":
 
+        # Infer where the database is - on-prem or SaaS.
+        if all((dsn, db_user, db_password, bucketfs_host, bucketfs_port,
+                bucketfs_name, bucket, bucketfs_user, bucketfs_password)):
+            connection_params = {'dsn': dsn, 'user': db_user, 'password': db_password}
+            bfs_url = (f"{'https' if bucketfs_use_https else 'http'}://"
+                       f"{bucketfs_host}:{bucketfs_port}")
+            verify = ssl_trusted_ca or use_ssl_cert_validation
+            bucketfs_path = bfs.path.build_path(backend=bfs.path.StorageBackend.onprem,
+                                                url=bfs_url,
+                                                username=bucketfs_user,
+                                                password=bucketfs_password,
+                                                service_name=bucketfs_name,
+                                                bucket_name=bucket,
+                                                verify=verify,
+                                                path=path_in_bucket)
+
+        elif all((saas_url, saas_account_id, saas_database_id, saas_token)):
+            connection_params = get_connection_params(host=saas_url,
+                                                      account_id=saas_account_id,
+                                                      database_id=saas_database_id,
+                                                      pat=saas_token)
+            bucketfs_path = bfs.path.build_path(backend=bfs.path.StorageBackend.saas,
+                                                url=saas_url,
+                                                account_id=saas_account_id,
+                                                database_id=saas_database_id,
+                                                pat=saas_token,
+                                                path=path_in_bucket)
+        else:
+            raise ValueError('Incomplete parameter list. '
+                             'Please either provide the parameters [dns, db_user, '
+                             'db_password, bucketfs_host, bucketfs_port, bucketfs_name, '
+                             'bucket, bucketfs_user, bucketfs_password] for an On-Prem '
+                             'database or [saas_url, saas_account_id, saas_database_id, '
+                             'saas_token] for a SaaS database.')
+
         websocket_sslopt = get_websocket_sslopt(use_ssl_cert_validation, ssl_trusted_ca,
                                                 ssl_client_certificate, ssl_private_key)
 
-        pyexasol_conn = pyexasol.connect(
-            dsn=dsn,
-            user=db_user,
-            password=db_password,
-            encryption=True,
-            websocket_sslopt=websocket_sslopt
-        )
+        pyexasol_conn = pyexasol.connect(**connection_params,
+                                         encryption=True,
+                                         websocket_sslopt=websocket_sslopt)
 
-        bucketfs_location = create_bucketfs_location(
-            bucketfs_name, bucketfs_host, bucketfs_port, bucketfs_use_https,
-            bucketfs_user, bucketfs_password, bucket, path_in_bucket)
-
-        return cls(pyexasol_conn, language_alias, bucketfs_location)
+        return cls(pyexasol_conn, language_alias, bucketfs_path)
