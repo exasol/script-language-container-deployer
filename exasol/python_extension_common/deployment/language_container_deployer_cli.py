@@ -8,6 +8,9 @@ from exasol.python_extension_common.deployment.language_container_deployer impor
 
 DB_PASSWORD_ENVIRONMENT_VARIABLE = "DB_PASSWORD"
 BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE = "BUCKETFS_PASSWORD"
+SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE = "SAAS_ACCOUNT_ID"
+SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE = "SAAS_DATABASE_ID"
+SAAS_TOKEN_ENVIRONMENT_VARIABLE = "SAAS_TOKEN"
 
 
 class CustomizableParameters(Enum):
@@ -80,24 +83,32 @@ slc_parameter_formatters = _ParameterFormatters()
 
 
 @click.command(name="language-container")
-@click.option('--bucketfs-name', type=str, required=True)
-@click.option('--bucketfs-host', type=str, required=True)
-@click.option('--bucketfs-port', type=int, required=True)
+@click.option('--bucketfs-name', type=str)
+@click.option('--bucketfs-host', type=str)
+@click.option('--bucketfs-port', type=int)
 @click.option('--bucketfs-use-https', type=bool, default=False)
-@click.option('--bucketfs-user', type=str, required=True, default="w")
-@click.option('--bucketfs-password', prompt='bucketFS password', hide_input=True,
-              default=lambda: os.environ.get(BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE, ""))
-@click.option('--bucket', type=str, required=True)
-@click.option('--path-in-bucket', type=str, required=True, default=None)
+@click.option('--bucketfs-user', type=str)
+@click.option('--bucketfs-password', type=str,
+              default=lambda: os.environ.get(BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE))
+@click.option('--bucket', type=str)
+@click.option('--saas-url', type=str,
+              default='https://cloud.exasol.com')
+@click.option('--saas-account-id', type=str,
+              default=lambda: os.environ.get(SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE))
+@click.option('--saas-database-id', type=str,
+              default=lambda: os.environ.get(SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE))
+@click.option('--saas-token', type=str,
+              default=lambda: os.environ.get(SAAS_TOKEN_ENVIRONMENT_VARIABLE))
+@click.option('--path-in-bucket', type=str)
 @click.option('--container-file',
-              type=click.Path(exists=True, file_okay=True), default=None)
-@click.option('--version', type=str, default=None, expose_value=False,
+              type=click.Path(exists=True, file_okay=True))
+@click.option('--version', type=str, expose_value=False,
               callback=slc_parameter_formatters)
-@click.option('--dsn', type=str, required=True)
-@click.option('--db-user', type=str, required=True)
-@click.option('--db-pass', prompt='db password', hide_input=True,
-              default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE, ""))
-@click.option('--language-alias', type=str, default="PYTHON3_TE")
+@click.option('--dsn', type=str)
+@click.option('--db-user', type=str)
+@click.option('--db-pass',
+              default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE))
+@click.option('--language-alias', type=str, default="PYTHON3_EXT")
 @click.option('--ssl-cert-path', type=str, default="")
 @click.option('--ssl-client-cert-path', type=str, default="")
 @click.option('--ssl-client-private-key', type=str, default="")
@@ -113,6 +124,10 @@ def language_container_deployer_main(
         bucketfs_user: str,
         bucketfs_password: str,
         bucket: str,
+        saas_url: str,
+        saas_account_id: str,
+        saas_database_id: str,
+        saas_token: str,
         path_in_bucket: str,
         container_file: str,
         dsn: str,
@@ -137,6 +152,10 @@ def language_container_deployer_main(
         bucketfs_user=bucketfs_user,
         bucketfs_password=bucketfs_password,
         bucket=bucket,
+        saas_url=saas_url,
+        saas_account_id=saas_account_id,
+        saas_database_id=saas_database_id,
+        saas_token=saas_token,
         path_in_bucket=path_in_bucket,
         dsn=dsn,
         db_user=db_user,
