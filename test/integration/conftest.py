@@ -99,9 +99,13 @@ def api_access(saas_host, saas_token, saas_account_id) -> OpenApiAccess:
 
 
 @pytest.fixture(scope="session")
-def operational_saas_database_id(api_access) -> str:
-    database_name = timestamp_name('PEC')
-    with api_access.database(database_name) as db:
+def saas_database_name() -> str:
+    return timestamp_name('PEC')
+
+
+@pytest.fixture(scope="session")
+def operational_saas_database_id(api_access, saas_database_name) -> str:
+    with api_access.database(saas_database_name) as db:
         api_access.wait_until_running(db.id)
         yield db.id
 
