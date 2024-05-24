@@ -106,7 +106,7 @@ def secret_callback(ctx: click.Context, param: click.Option, value: Any):
     be no way of altering this behaviour.
     """
     if value == SECRET_DISPLAY:
-        secret_param = SecretParams(param.name)
+        secret_param = SecretParams(param.opts[0][2:])
         return os.environ.get(secret_param.name)
     return value
 
