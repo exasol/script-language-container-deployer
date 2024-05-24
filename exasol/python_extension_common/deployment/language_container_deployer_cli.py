@@ -119,20 +119,20 @@ def secret_callback(ctx: click.Context, param: click.Option, value: Any):
 @click.option('--bucketfs-user', type=str)
 @click.option(f'--{SecretParams.BUCKETFS_PASSWORD.value}', type=str,
               prompt='BucketFS password', prompt_required=False,
-              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+              hide_input=True, default=SECRET_DISPLAY, callback=secret_callback)
 @click.option('--bucket', type=str)
 @click.option('--saas-url', type=str,
               default='https://cloud.exasol.com')
 @click.option(f'--{SecretParams.SAAS_ACCOUNT_ID.value}', type=str,
               prompt='SaaS account id', prompt_required=False,
-              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+              hide_input=True, default=SECRET_DISPLAY, callback=secret_callback)
 @click.option(f'--{SecretParams.SAAS_DATABASE_ID.value}', type=str,
               prompt='SaaS database id', prompt_required=False,
-              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+              hide_input=True, default=SECRET_DISPLAY, callback=secret_callback)
 @click.option('--saas-database-name', type=str)
 @click.option(f'--{SecretParams.SAAS_TOKEN.value}', type=str,
               prompt='SaaS token', prompt_required=False,
-              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+              hide_input=True, default=SECRET_DISPLAY, callback=secret_callback)
 @click.option('--path-in-bucket', type=str)
 @click.option('--container-file',
               type=click.Path(exists=True, file_okay=True))
@@ -142,7 +142,7 @@ def secret_callback(ctx: click.Context, param: click.Option, value: Any):
 @click.option('--db-user', type=str)
 @click.option(f'--{SecretParams.DB_PASSWORD.value}', type=str,
               prompt='DB password', prompt_required=False,
-              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+              hide_input=True, default=SECRET_DISPLAY, callback=secret_callback)
 @click.option('--language-alias', type=str, default="PYTHON3_EXT")
 @click.option('--ssl-cert-path', type=str, default="")
 @click.option('--ssl-client-cert-path', type=str, default="")
