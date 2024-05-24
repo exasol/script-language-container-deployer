@@ -11,11 +11,6 @@ from exasol.saas.client.api_access import (
     OpenApiAccess,
     get_connection_params
 )
-from exasol.saas.client.openapi.models import CreateAllowedIP
-from exasol.saas.client.openapi.api.security.add_allowed_ip import sync as add_allowed_ip
-from exasol.saas.client.openapi.api.security.delete_allowed_ip import sync_detailed as delete_allowed_ip
-from exasol.saas.client.openapi.api.clusters.list_clusters import sync as list_clusters
-from exasol.saas.client.openapi.api.clusters.get_cluster_connection import sync as get_cluster_connection
 
 from exasol.python_extension_common.deployment.language_container_deployer_cli import (
     language_container_deployer_main, slc_parameter_formatters, CustomizableParameters)

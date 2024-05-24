@@ -85,7 +85,8 @@ def test_language_container_deployer_cli_with_container_file(
                                                        language_alias=TEST_LANGUAGE_ALIAS,
                                                        url=saas_host,
                                                        account_id=saas_account_id,
-                                                       database_name=saas_database_name,
+                                                       # database_name=saas_database_name,
+                                                       database_id=operational_saas_database_id,
                                                        token=saas_token)
         assert result.exit_code == 0
         assert result.exception is None
