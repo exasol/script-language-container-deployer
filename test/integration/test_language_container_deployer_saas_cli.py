@@ -8,11 +8,7 @@ import pytest
 from click.testing import CliRunner
 
 import pyexasol
-from exasol.python_extension_common.deployment.language_container_deployer_cli import (
-    SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE,
-    SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE,
-    SAAS_TOKEN_ENVIRONMENT_VARIABLE,
-)
+from exasol.python_extension_common.deployment.language_container_deployer_cli import SecretParams
 
 from test.utils.revert_language_settings import revert_language_settings
 from test.utils.db_utils import (create_schema, assert_udf_running)
@@ -33,9 +29,10 @@ def call_language_definition_deployer_cli(func,
                                           version: Optional[str] = None,
                                           use_ssl_cert_validation: bool = False):
 
-    os.environ[SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE] = account_id
-    os.environ[SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE] = database_id
-    os.environ[SAAS_TOKEN_ENVIRONMENT_VARIABLE] = token
+    os.environ[SecretParams.SAAS_ACCOUNT_ID.name] = account_id
+    os.environ[SecretParams.SAAS_TOKEN.name] = token
+    if database_id:
+        os.environ[SecretParams.SAAS_DATABASE_ID.name] = database_id
 
     args_list = [
         "language-container",
@@ -88,8 +85,7 @@ def test_language_container_deployer_cli_with_container_file(
                                                        language_alias=TEST_LANGUAGE_ALIAS,
                                                        url=saas_host,
                                                        account_id=saas_account_id,
-                                                       # database_name=saas_database_name,
-                                                       database_id=operational_saas_database_id,
+                                                       database_name=saas_database_name,
                                                        token=saas_token)
         assert result.exit_code == 0
         assert result.exception is None

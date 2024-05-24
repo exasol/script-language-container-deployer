@@ -6,12 +6,6 @@ from pathlib import Path
 import click
 from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
 
-DB_PASSWORD_ENVIRONMENT_VARIABLE = "DB_PASSWORD"
-BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE = "BUCKETFS_PASSWORD"
-SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE = "SAAS_ACCOUNT_ID"
-SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE = "SAAS_DATABASE_ID"
-SAAS_TOKEN_ENVIRONMENT_VARIABLE = "SAAS_TOKEN"
-
 
 class CustomizableParameters(Enum):
     """
@@ -82,23 +76,63 @@ class _ParameterFormatters:
 slc_parameter_formatters = _ParameterFormatters()
 
 
+# This text will be displayed instead of the actual value, if found in an environment
+# variable, in a prompt.
+SECRET_DISPLAY = '***'
+
+
+class SecretParams(Enum):
+    """
+    This enum serves as a definition of confidential parameters which values should not be
+    displayed in the console, unless the user types them in the command line.
+
+    The enum name is also the name of the environment variable where the correspondent
+    secret value can be stored.
+
+    The enum value is also the name of the cli parameter.
+    """
+    DB_PASSWORD = 'db-pass'
+    BUCKETFS_PASSWORD = 'bucketfs-password'
+    SAAS_ACCOUNT_ID = 'saas-account-id'
+    SAAS_DATABASE_ID = 'saas-database-id'
+    SAAS_TOKEN = 'saas-token'
+
+
+def secret_callback(ctx: click.Context, param: click.Option, value: Any):
+    """
+    Here we try to get the secret parameter value from an environment variable.
+    The reason for doing this in the callback instead of using a callable default is
+    that we don't want the default to be displayed in the prompt. There seems to
+    be no way of altering this behaviour.
+    """
+    if value == SECRET_DISPLAY:
+        secret_param = SecretParams(param.name)
+        return os.environ.get(secret_param.name)
+    return value
+
+
 @click.command(name="language-container")
 @click.option('--bucketfs-name', type=str)
 @click.option('--bucketfs-host', type=str)
 @click.option('--bucketfs-port', type=int)
 @click.option('--bucketfs-use-https', type=bool, default=False)
 @click.option('--bucketfs-user', type=str)
-@click.option('--bucketfs-password', type=str,
-              default=lambda: os.environ.get(BUCKETFS_PASSWORD_ENVIRONMENT_VARIABLE))
+@click.option(f'--{SecretParams.BUCKETFS_PASSWORD.value}', type=str,
+              prompt='BucketFS password', prompt_required=False,
+              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
 @click.option('--bucket', type=str)
 @click.option('--saas-url', type=str,
               default='https://cloud.exasol.com')
-@click.option('--saas-account-id', type=str,
-              default=lambda: os.environ.get(SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE))
-@click.option('--saas-database-id', type=str,
-              default=lambda: os.environ.get(SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE))
-@click.option('--saas-token', type=str,
-              default=lambda: os.environ.get(SAAS_TOKEN_ENVIRONMENT_VARIABLE))
+@click.option(f'--{SecretParams.SAAS_ACCOUNT_ID.value}', type=str,
+              prompt='SaaS account id', prompt_required=False,
+              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+@click.option(f'--{SecretParams.SAAS_DATABASE_ID.value}', type=str,
+              prompt='SaaS database id', prompt_required=False,
+              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
+@click.option('--saas-database-name', type=str)
+@click.option(f'--{SecretParams.SAAS_TOKEN.value}', type=str,
+              prompt='SaaS token', prompt_required=False,
+              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
 @click.option('--path-in-bucket', type=str)
 @click.option('--container-file',
               type=click.Path(exists=True, file_okay=True))
@@ -106,8 +140,9 @@ slc_parameter_formatters = _ParameterFormatters()
               callback=slc_parameter_formatters)
 @click.option('--dsn', type=str)
 @click.option('--db-user', type=str)
-@click.option('--db-pass',
-              default=lambda: os.environ.get(DB_PASSWORD_ENVIRONMENT_VARIABLE))
+@click.option(f'--{SecretParams.DB_PASSWORD.value}', type=str,
+              prompt='DB password', prompt_required=False,
+              hide_input=True, default=SECRET_DISPLAY, callable=secret_callback)
 @click.option('--language-alias', type=str, default="PYTHON3_EXT")
 @click.option('--ssl-cert-path', type=str, default="")
 @click.option('--ssl-client-cert-path', type=str, default="")
@@ -127,6 +162,7 @@ def language_container_deployer_main(
         saas_url: str,
         saas_account_id: str,
         saas_database_id: str,
+        saas_database_name: str,
         saas_token: str,
         path_in_bucket: str,
         container_file: str,
@@ -155,6 +191,7 @@ def language_container_deployer_main(
         saas_url=saas_url,
         saas_account_id=saas_account_id,
         saas_database_id=saas_database_id,
+        saas_database_name=saas_database_name,
         saas_token=saas_token,
         path_in_bucket=path_in_bucket,
         dsn=dsn,
