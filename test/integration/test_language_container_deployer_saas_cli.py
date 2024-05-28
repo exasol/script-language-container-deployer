@@ -8,11 +8,7 @@ import pytest
 from click.testing import CliRunner
 
 import pyexasol
-from exasol.python_extension_common.deployment.language_container_deployer_cli import (
-    SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE,
-    SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE,
-    SAAS_TOKEN_ENVIRONMENT_VARIABLE,
-)
+from exasol.python_extension_common.deployment.language_container_deployer_cli import SecretParams
 
 from test.utils.revert_language_settings import revert_language_settings
 from test.utils.db_utils import (create_schema, assert_udf_running)
@@ -26,26 +22,28 @@ def call_language_definition_deployer_cli(func,
                                           language_alias: str,
                                           url: str,
                                           account_id: str,
-                                          database_id: str,
                                           token: str,
-                                          connection_params: dict[str, Any],
+                                          database_id: Optional[str] = None,
+                                          database_name: Optional[str] = None,
                                           container_path: Optional[str] = None,
                                           version: Optional[str] = None,
                                           use_ssl_cert_validation: bool = False):
 
-    os.environ[SAAS_ACCOUNT_ID_ENVIRONMENT_VARIABLE] = account_id
-    os.environ[SAAS_DATABASE_ID_ENVIRONMENT_VARIABLE] = database_id
-    os.environ[SAAS_TOKEN_ENVIRONMENT_VARIABLE] = token
+    os.environ[SecretParams.SAAS_ACCOUNT_ID.name] = account_id
+    os.environ[SecretParams.SAAS_TOKEN.name] = token
+    if database_id:
+        os.environ[SecretParams.SAAS_DATABASE_ID.name] = database_id
 
     args_list = [
         "language-container",
         "--saas-url", url,
         "--path-in-bucket", "container",
-        "--dsn", connection_params['dsn'],
-        "--db-user", connection_params['user'],
-        "--db-pass", connection_params['password'],
         "--language-alias", language_alias
     ]
+    if database_name:
+        args_list += [
+            "--saas-database-name", database_name
+        ]
     if use_ssl_cert_validation:
         args_list += [
             "--use-ssl-cert-validation"
@@ -73,6 +71,7 @@ def test_language_container_deployer_cli_with_container_file(
         saas_token: str,
         saas_account_id: str,
         operational_saas_database_id: str,
+        saas_database_name: str,
         saas_connection_params: dict[str, Any],
         container_path: str,
         main_func
@@ -86,9 +85,8 @@ def test_language_container_deployer_cli_with_container_file(
                                                        language_alias=TEST_LANGUAGE_ALIAS,
                                                        url=saas_host,
                                                        account_id=saas_account_id,
-                                                       database_id=operational_saas_database_id,
-                                                       token=saas_token,
-                                                       connection_params=saas_connection_params)
+                                                       database_name=saas_database_name,
+                                                       token=saas_token)
         assert result.exit_code == 0
         assert result.exception is None
         assert result.stdout == ""

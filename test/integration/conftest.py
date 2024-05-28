@@ -11,11 +11,6 @@ from exasol.saas.client.api_access import (
     OpenApiAccess,
     get_connection_params
 )
-from exasol.saas.client.openapi.models import CreateAllowedIP
-from exasol.saas.client.openapi.api.security.add_allowed_ip import sync as add_allowed_ip
-from exasol.saas.client.openapi.api.security.delete_allowed_ip import sync_detailed as delete_allowed_ip
-from exasol.saas.client.openapi.api.clusters.list_clusters import sync as list_clusters
-from exasol.saas.client.openapi.api.clusters.get_cluster_connection import sync as get_cluster_connection
 
 from exasol.python_extension_common.deployment.language_container_deployer_cli import (
     language_container_deployer_main, slc_parameter_formatters, CustomizableParameters)
@@ -99,9 +94,13 @@ def api_access(saas_host, saas_token, saas_account_id) -> OpenApiAccess:
 
 
 @pytest.fixture(scope="session")
-def operational_saas_database_id(api_access) -> str:
-    database_name = timestamp_name('PEC')
-    with api_access.database(database_name) as db:
+def saas_database_name() -> str:
+    return timestamp_name('PEC')
+
+
+@pytest.fixture(scope="session")
+def operational_saas_database_id(api_access, saas_database_name) -> str:
+    with api_access.database(saas_database_name) as db:
         api_access.wait_until_running(db.id)
         yield db.id
 
