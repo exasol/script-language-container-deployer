@@ -156,9 +156,11 @@ class LanguageContainerDeployer:
             self.upload_container(container_file, bucket_file_path)
 
         # Activate the language container.
-        alter_type = (LanguageActivationLevel.System if alter_system
-                      else LanguageActivationLevel.Session)
-        self.activate_container(bucket_file_path, alter_type, allow_override)
+        if alter_system:
+            self.activate_container(bucket_file_path, LanguageActivationLevel.System,
+                                    allow_override)
+        self.activate_container(bucket_file_path, LanguageActivationLevel.Session,
+                                allow_override)
 
         # Maybe wait until the container becomes operational.
         if container_file and wait_for_completion:
