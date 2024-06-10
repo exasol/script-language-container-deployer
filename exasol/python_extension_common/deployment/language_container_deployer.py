@@ -10,6 +10,10 @@ import pyexasol     # type: ignore
 import exasol.bucketfs as bfs   # type: ignore
 from exasol.saas.client.api_access import (get_connection_params, get_database_id)      # type: ignore
 
+from exasol.python_extension_common.deployment.language_container_validator import (
+    wait_language_container, temp_schema
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +102,8 @@ class LanguageContainerDeployer:
     def download_and_run(self, url: str,
                          bucket_file_path: str,
                          alter_system: bool = True,
-                         allow_override: bool = False) -> None:
+                         allow_override: bool = False,
+                         wait_for_completion: bool = True) -> None:
         """
         Downloads the language container from the provided url to a temporary file and then deploys it.
         See docstring on the `run` method for details on what is involved in the deployment.
@@ -108,6 +113,7 @@ class LanguageContainerDeployer:
         alter_system     - If True will try to activate the container at the System level.
         allow_override   - If True the activation of a language container with the same alias will be
                            overriden, otherwise a RuntimeException will be thrown.
+        wait_for_completion - If True will wait until the language container becomes operational.
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
@@ -115,19 +121,21 @@ class LanguageContainerDeployer:
             response.raise_for_status()
             tmp_file.write(response.content)
 
-            self.run(Path(tmp_file.name), bucket_file_path, alter_system, allow_override)
+            self.run(Path(tmp_file.name), bucket_file_path, alter_system, allow_override,
+                     wait_for_completion)
 
     def run(self, container_file: Optional[Path] = None,
             bucket_file_path: Optional[str] = None,
             alter_system: bool = True,
-            allow_override: bool = False) -> None:
+            allow_override: bool = False,
+            wait_for_completion: bool = True) -> None:
         """
         Deploys the language container. This includes two steps, both of which are optional:
         - Uploading the container into the database. This step can be skipped if the container
           has already been uploaded.
-        - Activating the container. This step may have to be skipped if the user does not have
-          System Privileges in the database. In that case two alternative activation SQL commands
-          will be printed on the console.
+        - Activating the container. In case the container does not get activated at the System
+        level, two alternative activation SQL commands (one for the System and one for the Session
+        levels) will be printed on the console.
 
         container_file   - Path of the container tar.gz file in a local file system.
                            If not provided the container is assumed to be uploaded already.
@@ -136,6 +144,7 @@ class LanguageContainerDeployer:
         alter_system     - If True will try to activate the container at the System level.
         allow_override   - If True the activation of a language container with the same alias will be
                            overriden, otherwise a RuntimeException will be thrown.
+        wait_for_completion - If True will wait until the language container becomes operational.
         """
 
         if not bucket_file_path:
@@ -146,9 +155,17 @@ class LanguageContainerDeployer:
         if container_file:
             self.upload_container(container_file, bucket_file_path)
 
-        if alter_system:
-            self.activate_container(bucket_file_path, LanguageActivationLevel.System, allow_override)
-        else:
+        # Activate the language container.
+        alter_type = (LanguageActivationLevel.System if alter_system
+                      else LanguageActivationLevel.Session)
+        self.activate_container(bucket_file_path, alter_type, allow_override)
+
+        # Maybe wait until the container becomes operational.
+        if container_file and wait_for_completion:
+            with temp_schema(self._pyexasol_conn) as schema:
+                wait_language_container(self._pyexasol_conn, self._language_alias, schema)
+
+        if not alter_system:
             message = dedent(f"""
             In SQL, you can activate the SLC
             by using the following statements:
