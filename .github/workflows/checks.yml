@@ -10,12 +10,12 @@ jobs:
     steps:
 
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.12.0
 
       - name: Check Version(s)
         run: poetry run version-check version.py
@@ -27,10 +27,10 @@ jobs:
 
     steps:
     - name: SCM Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python & Poetry Environment
-      uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0
+      uses: exasol/python-toolbox/.github/actions/python-environment@0.12.0
 
     - name: Build Documentation
       run: |
@@ -47,10 +47,10 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.12.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -74,10 +74,10 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.12.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -87,42 +87,14 @@ jobs:
   tests-job:
     name: Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [build-documentation-job, lint-job, type-check-job]
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    uses: ./.github/workflows/run-tests.yml
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         exasol-version: ["7.1.9"]
-
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.8.0
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Calculate Test Coverage with SaaS
-        if: "contains(github.event.head_commit.message, '[run-saas-tests]') && (matrix.python-version == '3.10')"
-        env:
-          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
-          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
-          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run nox -s coverage -- -- --db-version ${{ matrix.exasol-version }}
-
-      - name: Calculate Test Coverage without SaaS
-        if: "!contains(github.event.head_commit.message, '[run-saas-tests]') || (matrix.python-version != '3.10')"
-        run: poetry run nox -s coverage -- -- -m "not saas" --db-version ${{ matrix.exasol-version }}
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: .coverage
-          path: .coverage
-
-      - name: Fail, if SaaS tests are not activated
-        if: "!contains(github.event.head_commit.message, '[run-saas-tests]') && (matrix.python-version == '3.10')"
-        run: |
-          echo "Failed because the SaaS tests are not activated"
-          exit 1
+    secrets: inherit
+    with:
+      python-version: ${{ matrix.python-version }}
+      exasol-version: ${{ matrix.exasol-version }}
