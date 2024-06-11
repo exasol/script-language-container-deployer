@@ -87,7 +87,6 @@ jobs:
   tests-job:
     name: Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [build-documentation-job, lint-job, type-check-job]
-    # runs-on: ubuntu-latest
     uses: ./.github/workflows/run-tests.yml
     strategy:
       fail-fast: false
