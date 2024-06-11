@@ -151,6 +151,7 @@ def secret_callback(ctx: click.Context, param: click.Option, value: Any):
 @click.option('--upload-container/--no-upload_container', type=bool, default=True)
 @click.option('--alter-system/--no-alter-system', type=bool, default=True)
 @click.option('--allow-override/--disallow-override', type=bool, default=False)
+@click.option('--wait_for_completion/--no-wait_for_completion', type=bool, default=True)
 def language_container_deployer_main(
         bucketfs_name: str,
         bucketfs_host: str,
@@ -177,6 +178,7 @@ def language_container_deployer_main(
         upload_container: bool,
         alter_system: bool,
         allow_override: bool,
+        wait_for_completion: bool,
         container_url: Optional[str] = None,
         container_name: Optional[str] = None):
 
@@ -204,12 +206,14 @@ def language_container_deployer_main(
         use_ssl_cert_validation=use_ssl_cert_validation)
 
     if not upload_container:
-        deployer.run(alter_system=alter_system, allow_override=allow_override)
+        deployer.run(alter_system=alter_system, allow_override=allow_override,
+                     wait_for_completion=wait_for_completion)
     elif container_file:
-        deployer.run(container_file=Path(container_file), alter_system=alter_system, allow_override=allow_override)
+        deployer.run(container_file=Path(container_file), alter_system=alter_system,
+                     allow_override=allow_override, wait_for_completion=wait_for_completion)
     elif container_url and container_name:
         deployer.download_and_run(container_url, container_name, alter_system=alter_system,
-                                  allow_override=allow_override)
+                                  allow_override=allow_override, wait_for_completion=wait_for_completion)
     else:
         # The error message should mention the parameters which the callback is specified for being missed.
         raise ValueError("To upload a language container you should specify either its "

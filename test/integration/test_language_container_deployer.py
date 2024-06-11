@@ -49,10 +49,7 @@ def test_language_container_deployer(
                                              pyexasol_connection=pyexasol_connection,
                                              bucketfs_config=itde.bucketfs)
         deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
-        # In order to check that the uploaded container works we need a new pyexasol connection.
-        # The system level activation of the language container didn't affect pre-existing sessions.
-        new_connection = stack.enter_context(connection_factory(itde.db))
-        assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
+        assert_udf_running(pyexasol_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
 
 
 def test_language_container_deployer_alter_session(
