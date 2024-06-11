@@ -57,15 +57,4 @@ def test_language_container_deployer(
                                              database_id=operational_saas_database_id,
                                              token=saas_pat)
         deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
-
-        # Need to give the SaaS BucketFS some time to digest the language container.
-        # The required time is somewhere between 20 seconds and 5 minutes.
-        time.sleep(300.)
-        # In order to check that the uploaded container works we need a new pyexasol connection.
-        # The system level activation of the language container didn't affect pre-existing sessions.
-        new_connection = stack.enter_context(pyexasol.connect(**saas_connection_params, compression=True))
-        assert_udf_running(new_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
-
-
-def test_xxx(database_name):
-    print(f'{database_name}')
+        assert_udf_running(pyexasol_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)

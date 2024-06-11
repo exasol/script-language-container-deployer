@@ -1,5 +1,5 @@
 from pathlib import Path, PurePosixPath
-from unittest.mock import create_autospec, MagicMock, patch
+from unittest.mock import create_autospec, MagicMock, patch, call
 
 import pytest
 import exasol.bucketfs as bfs
@@ -49,27 +49,39 @@ def test_slc_deployer_deploy(container_deployer, container_file_name, container_
     container_deployer.run(container_file=container_file_path,
                            bucket_file_path=container_file_name,
                            alter_system=True,
-                           allow_override=True)
+                           allow_override=True,
+                           wait_for_completion=False)
     container_deployer.upload_container.assert_called_once_with(container_file_path,
                                                                 container_file_name)
-    container_deployer.activate_container.assert_called_once_with(container_file_name,
-                                                                  LanguageActivationLevel.System,
-                                                                  True)
+    expected_calls = [
+        call(container_file_name, LanguageActivationLevel.Session, True),
+        call(container_file_name, LanguageActivationLevel.System, True)
+    ]
+    container_deployer.activate_container.assert_has_calls(expected_calls, any_order=True)
 
 
 def test_slc_deployer_upload(container_deployer, container_file_name, container_file_path):
-    container_deployer.run(container_file=container_file_path, alter_system=False)
+    container_deployer.run(container_file=container_file_path,
+                           alter_system=False,
+                           wait_for_completion=False)
     container_deployer.upload_container.assert_called_once_with(container_file_path,
                                                                 container_file_name)
-    container_deployer.activate_container.assert_not_called()
+    container_deployer.activate_container.assert_called_once_with(container_file_name,
+                                                                  LanguageActivationLevel.Session,
+                                                                  False)
 
 
 def test_slc_deployer_activate(container_deployer, container_file_name):
-    container_deployer.run(bucket_file_path=container_file_name, alter_system=True, allow_override=True)
+    container_deployer.run(bucket_file_path=container_file_name,
+                           alter_system=True,
+                           allow_override=True,
+                           wait_for_completion=False)
     container_deployer.upload_container.assert_not_called()
-    container_deployer.activate_container.assert_called_once_with(container_file_name,
-                                                                  LanguageActivationLevel.System,
-                                                                  True)
+    expected_calls = [
+        call(container_file_name, LanguageActivationLevel.Session, True),
+        call(container_file_name, LanguageActivationLevel.System, True)
+    ]
+    container_deployer.activate_container.assert_has_calls(expected_calls, any_order=True)
 
 
 @patch('exasol.python_extension_common.deployment.language_container_deployer.get_udf_path')

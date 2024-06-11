@@ -91,9 +91,6 @@ def test_language_container_deployer_cli_with_container_file(
         assert result.exception is None
         assert result.stdout == ""
 
-        # Need to give the SaaS BucketFS some time to digest the language container.
-        # The required time is somewhere between 20 seconds and 5 minutes.
-        time.sleep(300.)
         # In order to check that the uploaded container works we need a new pyexasol connection.
         # The deployer should have activated the language container at the system level but that would
         # not affect pre-existing sessions.
