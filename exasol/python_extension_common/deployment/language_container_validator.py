@@ -15,18 +15,19 @@ import pyexasol     # type: ignore
 _DUMMY_UDF_NAME = 'DUMMY_UDF'
 
 
-def _dress_schema(schema: str | None) -> str:
+def _get_test_udf_name(schema: str | None) -> str:
 
     if schema:
-        return f'"{schema}".'
-    return ''
+        return f'"{schema}"."{_DUMMY_UDF_NAME}"'
+    return f'"{_DUMMY_UDF_NAME}"'
 
 
 def _create_dummy_udf(conn: pyexasol.ExaConnection, language_alias: str,
                       schema: str | None) -> None:
 
+    udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    CREATE OR REPLACE {language_alias} SCALAR SCRIPT {_dress_schema(schema)}"{_DUMMY_UDF_NAME}"()
+    CREATE OR REPLACE {language_alias} SCALAR SCRIPT {udf_name}()
     RETURNS DECIMAL(1, 0) AS
 
     def run(ctx):
@@ -38,8 +39,9 @@ def _create_dummy_udf(conn: pyexasol.ExaConnection, language_alias: str,
 
 def _call_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
 
+    udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    SELECT {_dress_schema(schema)}"{_DUMMY_UDF_NAME}"()
+    SELECT {udf_name}()
     GROUP BY IPROC();
     """)
     result = conn.execute(sql).fetchall()
@@ -48,8 +50,9 @@ def _call_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
 
 def _delete_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
 
+    udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    DROP SCRIPT IF EXISTS {_dress_schema(schema)}"{_DUMMY_UDF_NAME};"
+    DROP SCRIPT IF EXISTS {udf_name}"
     """)
     conn.execute(sql)
 
@@ -64,7 +67,7 @@ def _create_random_schema(conn: pyexasol.ExaConnection, schema_name_length: int)
     return schema
 
 
-def _delete_random_schema(conn: pyexasol.ExaConnection, schema: str) -> None:
+def _delete_schema(conn: pyexasol.ExaConnection, schema: str) -> None:
 
     sql = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE;'
     conn.execute(query=sql)
@@ -134,4 +137,4 @@ def temp_schema(conn: pyexasol.ExaConnection,
         schema = _create_random_schema(conn, schema_name_length)
         yield schema
     finally:
-        _delete_random_schema(conn, schema)
+        _delete_schema(conn, schema)
