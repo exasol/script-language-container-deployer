@@ -31,6 +31,7 @@ jobs:
         run: true
 
   slow-test-detection:
+    name: Ask if Slow or Expensive Tests (e.g. SaaS) Should be Run
     runs-on: ubuntu-latest
     steps:
       - name: Detect Slow Tests
@@ -39,6 +40,7 @@ jobs:
       slow-tests
 
   run-slow-tests:
+    name: Run Slow or Expensive Tests (e.g. SaaS) if Requested
     uses: ./.github/workflows/run-tests.yml
     needs: [ slow-test-detection ]
     secrets: inherit
