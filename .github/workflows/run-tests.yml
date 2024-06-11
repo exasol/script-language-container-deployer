@@ -16,13 +16,14 @@ on:
 jobs:
 
   tests-job:
+    name: Run Tests (${{ inputs.python-version }})
     runs-on: ubuntu-latest
 
     steps:
       - name: Set pytest markers
         id: pytest-markers
         if: ${{ ! inputs.slow-tests }}
-        run: echo slow-tests='-m "not slow"' >> "$GITHUB_OUTPUT"
+        run: echo slow-tests='-m "not saas"' >> "$GITHUB_OUTPUT"
 
       - name: SCM Checkout
         uses: actions/checkout@v4
