@@ -52,7 +52,7 @@ def _delete_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
 
     udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    DROP SCRIPT IF EXISTS {udf_name}"
+    DROP SCRIPT IF EXISTS {udf_name};
     """)
     conn.execute(sql)
 
