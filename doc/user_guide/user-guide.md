@@ -2,10 +2,11 @@
 
 ## Language Container Deployer
 
-An extension would typically use [UDF scripts](https://docs.exasol.com/db/latest/database_concepts/udf_scripts.htm) to enable certain custom functionality within a database.
-In most cases, UDF scripts must be backed by a [Script Language Container (SLC)](https://github.com/exasol/script-languages-release/), that must be installed in the Exasol Database.
-A Script Language Container is a mechanism that allows the installation of the chosen programming language and
-necessary dependencies in the Exasol Database.
+An extension would typically use [UDF scripts](https://docs.exasol.com/db/latest/database_concepts/udf_scripts.htm)
+to enable certain custom functionality within a database. In most cases, UDF scripts must be backed by a
+[Script Language Container (SLC)](https://github.com/exasol/script-languages-release/), that must be installed in the
+Exasol Database. An SLC allows the installation of the chosen programming language and necessary dependencies in the
+Exasol Database.
 
 The language container for a particular Extension gets downloaded and installed by executing a deployment script
 similar to the one below.
@@ -22,7 +23,7 @@ determined by the storage backend being used - On-Prem or SaaS.
 ### List of options
 
 The table below lists all available options. It shows which ones are applicable for On-Prem and for SaaS backends.
-Unless stated otherwise in the comments column, an option is required for either or both backends.
+Unless stated otherwise in the comments column, the option is required for either or both backends.
 
 Some of the values, like passwords, are considered confidential. For security reasons, it is recommended to store
 those values in environment variables instead of providing them in the command line. The names of the environment
