@@ -68,10 +68,10 @@ def call_language_definition_deployer_cli(func,
 @pytest.mark.saas
 def test_language_container_deployer_cli_with_container_file(
         saas_host: str,
-        saas_token: str,
+        saas_pat: str,
         saas_account_id: str,
         operational_saas_database_id: str,
-        saas_database_name: str,
+        database_name: str,
         saas_connection_params: dict[str, Any],
         container_path: str,
         main_func
@@ -85,8 +85,8 @@ def test_language_container_deployer_cli_with_container_file(
                                                        language_alias=TEST_LANGUAGE_ALIAS,
                                                        url=saas_host,
                                                        account_id=saas_account_id,
-                                                       database_name=saas_database_name,
-                                                       token=saas_token)
+                                                       database_name=database_name,
+                                                       token=saas_pat)
         assert result.exit_code == 0
         assert result.exception is None
         assert result.stdout == ""

@@ -1,0 +1,52 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      slow-tests:
+        type: boolean
+        default: false
+      python-version:
+        type: string
+        required: true
+      exasol-version:
+        type: string
+        required: true
+
+jobs:
+
+  tests-job:
+    name: Run Tests (Python-${{ inputs.python-version }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set pytest markers
+        id: pytest-markers
+        if: ${{ ! inputs.slow-tests }}
+        run: echo slow-tests='-m "not saas"' >> "$GITHUB_OUTPUT"
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.12.0
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Run Tests and Calculate Coverage
+        env:
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+          PYTEST_ADDOPTS: '${{ steps.pytest-markers.outputs.slow-tests }}'
+        run: |
+          echo "PYTEST_ADDOPTS = $PYTEST_ADDOPTS"
+          export PROJECT_SHORT_TAG=$(poetry run nox -s get-project-short-tag)
+          poetry run nox -s coverage -- -- --db-version ${{ inputs.exasol-version}}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: .coverage
+          path: .coverage
+          overwrite: true
