@@ -38,7 +38,7 @@ def create_container_deployer(language_alias: str,
 @pytest.mark.saas
 def test_language_container_deployer(
         saas_host: str,
-        saas_token: str,
+        saas_pat: str,
         saas_account_id: str,
         operational_saas_database_id: str,
         saas_connection_params: dict[str, Any],
@@ -55,6 +55,6 @@ def test_language_container_deployer(
                                              url=saas_host,
                                              account_id=saas_account_id,
                                              database_id=operational_saas_database_id,
-                                             token=saas_token)
+                                             token=saas_pat)
         deployer.run(container_file=Path(container_path), alter_system=True, allow_override=True)
         assert_udf_running(pyexasol_connection, TEST_LANGUAGE_ALIAS, TEST_SCHEMA)
