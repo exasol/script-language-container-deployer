@@ -2,8 +2,8 @@
 
 ## Language Container Deployer
 
-An extension would typically use UDF scripts to enable certain custom functionality within a database.
-In most cases, UDF scripts must be backed by a Language Container, that should be installed in the Exasol Database.
+An extension would typically use [UDF scripts](https://docs.exasol.com/db/latest/database_concepts/udf_scripts.htm) to enable certain custom functionality within a database.
+In most cases, UDF scripts must be backed by a [Script Language Container (SLC)](https://github.com/exasol/script-languages-release/), that must be installed in the Exasol Database.
 A Script Language Container is a mechanism that allows the installation of the chosen programming language and
 necessary dependencies in the Exasol Database.
 
@@ -11,10 +11,10 @@ The language container for a particular Extension gets downloaded and installed 
 similar to the one below.
 
   ```buildoutcfg
-  python -m an_exasol_extension.deploy language-container <options>
+  python -m <exasol_extension>.deploy language-container <options>
   ```
 
-The name of the script (```an_exasol_extension.deploy``` in the above command) can vary from one extension to another.
+The name of the script (```<exasol_extension>.deploy``` in the above command) can vary from one extension to another.
 Please check the user guide of a particular extension. The rest of the command line will have a common format. It
 will include the command - ```language-container``` - and selected options. The choice of options is primarily
 determined by the storage backend being used - On-Prem or SaaS.
