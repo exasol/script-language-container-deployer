@@ -5,12 +5,7 @@ import pytest
 import click
 import requests
 
-from exasol.saas.client.api_access import (
-    create_saas_client,
-    timestamp_name,
-    OpenApiAccess,
-    get_connection_params
-)
+from exasol.saas.client.api_access import get_connection_params
 
 from exasol.python_extension_common.deployment.language_container_deployer_cli import (
     language_container_deployer_main, slc_parameter_formatters, CustomizableParameters)
@@ -65,52 +60,12 @@ def container_path(tmpdir_factory, container_url, container_name) -> str:
     return slc_path
 
 
-def _env(var: str) -> str:
-    result = os.environ.get(var)
-    if result:
-        return result
-    raise RuntimeError(f"Environment variable {var} is empty.")
-
-
 @pytest.fixture(scope="session")
-def saas_host() -> str:
-    return _env("SAAS_HOST")
-
-
-@pytest.fixture(scope="session")
-def saas_token() -> str:
-    return _env("SAAS_PAT")
-
-
-@pytest.fixture(scope="session")
-def saas_account_id() -> str:
-    return _env("SAAS_ACCOUNT_ID")
-
-
-@pytest.fixture(scope="session")
-def api_access(saas_host, saas_token, saas_account_id) -> OpenApiAccess:
-    with create_saas_client(saas_host, saas_token) as client:
-        yield OpenApiAccess(client, saas_account_id)
-
-
-@pytest.fixture(scope="session")
-def saas_database_name() -> str:
-    return timestamp_name('PEC')
-
-
-@pytest.fixture(scope="session")
-def operational_saas_database_id(api_access, saas_database_name) -> str:
-    with api_access.database(saas_database_name) as db:
-        api_access.wait_until_running(db.id)
-        yield db.id
-
-
-@pytest.fixture(scope="session")
-def saas_connection_params(saas_host, saas_token, saas_account_id, operational_saas_database_id,
-                           api_access) -> dict[str, Any]:
-    with api_access.allowed_ip():
-        connection_params = get_connection_params(host=saas_host,
-                                                  account_id=saas_account_id,
-                                                  database_id=operational_saas_database_id,
-                                                  pat=saas_token)
-        yield connection_params
+def saas_connection_params(saas_host, saas_pat, saas_account_id, operational_saas_database_id) -> dict[str, Any]:
+    connection_params = get_connection_params(
+        host=saas_host,
+        account_id=saas_account_id,
+        database_id=operational_saas_database_id,
+        pat=saas_pat,
+    )
+    yield connection_params
