@@ -1,3 +1,6 @@
 # Exasol Python Extension Common
 
-Content to be provided.
+A package with common functionality, shared by Exasol Python Extensions.
+
+See
+* [User Guide](doc/user_guide/user-guide.md)
