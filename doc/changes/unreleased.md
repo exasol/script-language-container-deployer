@@ -10,3 +10,8 @@
 ## Refactorings
 
 * #15: Used plugin pytest-saas
+
+
+## Documentation
+
+* #22: Added comment on using fixtures from pytest-plugin `pytest-exasol-saas`
