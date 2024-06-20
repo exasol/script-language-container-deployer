@@ -13,7 +13,7 @@ pyexasol = ">=0.25.0,<1.0.0"
 exasol-bucketfs = ">=0.10.0"
 click = "^8.1.7"
 exasol-saas-api = ">=0.7.0,<1.0.0"
-requests = "<2.32.0"
+requests = "<2.33.0"
 tenacity = "^8.3.0"
 
 [tool.poetry.group.dev.dependencies]
