@@ -8,8 +8,8 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<4.0"
-pyexasol = "^0.25.0"
+python = "^3.10.0"
+pyexasol = ">=0.25.0,<1.0.0"
 exasol-bucketfs = ">=0.10.0"
 click = "^8.1.7"
 exasol-saas-api = ">=0.7.0,<1.0.0"
