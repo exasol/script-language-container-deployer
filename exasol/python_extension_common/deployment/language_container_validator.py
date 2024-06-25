@@ -25,13 +25,14 @@ def _get_test_udf_name(schema: str | None) -> str:
 def _create_dummy_udf(conn: pyexasol.ExaConnection, language_alias: str,
                       schema: str | None) -> None:
 
+    # The dummy UDF returns the ID of the node it is running at.
     udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
     CREATE OR REPLACE {language_alias} SET SCRIPT {udf_name}(i DECIMAL(10, 0))
     RETURNS DECIMAL(10, 0) AS
 
     def run(ctx):
-        return ctx.i
+        return exa.meta.node_id
     /
     """)
     conn.execute(sql)
@@ -43,16 +44,17 @@ def _call_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
     sql = "SELECT NPROC();"
     nproc = conn.execute(sql).fetchval()
 
-    # This query runs the dummy udf on all nodes.
+    # This query should run the dummy udf on all nodes.
     udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
     SELECT {udf_name}(i) FROM VALUES BETWEEN 1 AND {nproc} t(i)
     GROUP BY i;
     """)
+    # The expected result is a collection of distinct node IDs from 0 to nproc - 1.
     result = conn.execute(sql).fetchall()
     set_result = {row[0] for row in result}
 
-    assert set_result == set(range(1, nproc + 1))
+    assert set_result == set(range(nproc))
 
 
 def _delete_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
