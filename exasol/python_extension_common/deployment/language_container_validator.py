@@ -27,11 +27,11 @@ def _create_dummy_udf(conn: pyexasol.ExaConnection, language_alias: str,
 
     udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    CREATE OR REPLACE {language_alias} SCALAR SCRIPT {udf_name}()
-    RETURNS DECIMAL(1, 0) AS
+    CREATE OR REPLACE {language_alias} SET SCRIPT {udf_name}(i DECIMAL(10, 0))
+    RETURNS DECIMAL(10, 0) AS
 
     def run(ctx):
-        return 0
+        return ctx.i
     /
     """)
     conn.execute(sql)
@@ -39,13 +39,20 @@ def _create_dummy_udf(conn: pyexasol.ExaConnection, language_alias: str,
 
 def _call_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
 
+    # First, need to find out the number of nodes.
+    sql = "SELECT NPROC();"
+    nproc = conn.execute(sql).fetchval()
+
+    # This query runs the dummy udf on all nodes.
     udf_name = _get_test_udf_name(schema)
     sql = dedent(f"""
-    SELECT {udf_name}()
-    GROUP BY IPROC();
+    SELECT {udf_name}(i) FROM VALUES BETWEEN 1 AND {nproc} t(i)
+    GROUP BY i;
     """)
     result = conn.execute(sql).fetchall()
-    assert result == [(0,)]
+    set_result = {row[0] for row in result}
+
+    assert set_result == set(range(1, nproc + 1))
 
 
 def _delete_dummy_udf(conn: pyexasol.ExaConnection, schema: str | None) -> None:
