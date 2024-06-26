@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exasol-python-extension-common"
-version = "0.2.0"
+version = "0.3.0"
 description = "A collection of common utilities for Exasol extensions."
 packages = [ {include = "exasol"}, ]
 authors = ["Mikhail Beck <mikhail.beck@exasol.com>"]
